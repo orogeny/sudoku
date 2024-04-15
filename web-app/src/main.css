@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Nunito";
+  src: url("/fonts/Nunito-VariableFont_wght.ttf");
+}
+
+:root {
+  background-color: black;
+  color: white;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  flex-grow: 1;
+
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+}
