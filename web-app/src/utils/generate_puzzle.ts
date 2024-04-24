@@ -6,11 +6,29 @@ const DIGITS = ["1", "2", "3", "4", "5", "6", "7", "8", "9"] as const;
 
 type Digit = (typeof DIGITS)[number];
 
+type Cell =
+  | {
+      kind: "empty";
+      digit: undefined;
+    }
+  | {
+      kind: "given";
+      digit: Digit;
+    }
+  | {
+      kind: "proposed";
+      digit: Digit;
+    }
+  | {
+      kind: "note";
+      digits: Digit[];
+    };
+
 function isDigit(value: unknown): value is Digit {
   return (
     typeof value === "string" &&
     value.length === 1 &&
-    "1" <= value &&
+    value >= "1" &&
     value <= "9"
   );
 }
@@ -27,9 +45,51 @@ const puzzles = {
 };
 
 function generatePuzzle(level: Level) {
-  return puzzles[level].split("").map((v) => {
-    return isDigit(v) ? v : ".";
-  }) as Array<Digit | ".">;
+  return puzzles[level].split("").map((v, i) => {
+    if (i === 6) return { kind: "note", digits: ["2", "7"] } as Cell;
+    if (i === 15) return { kind: "proposed", digit: "3" } as Cell;
+    return isDigit(v) ? { kind: "given", digit: v } : { kind: "empty" };
+  }) as Cell[];
 }
 
-export { DIGITS, type Digit, LEVELS, type Level, generatePuzzle };
+function columnSiblings(index: number) {
+  const column = index % 9;
+
+  return Array.from({ length: 9 }).map((_, i) => column + i * 9);
+}
+
+function rowSiblings(index: number) {
+  const row = Math.floor(index / 9);
+
+  return Array.from({ length: 9 }).map((_, i) => row * 9 + i);
+}
+
+function squareSiblings(index: number) {
+  const square = Math.floor(index / 27) * 3 + Math.floor((index % 9) / 3);
+
+  return Array.from({ length: 9 }).map(
+    (_, i) =>
+      Math.floor(square / 3) * 27 +
+      (square % 3) * 3 +
+      (i % 3) +
+      Math.floor(i / 3) * 9,
+  );
+}
+
+function siblingsOf(index: number) {
+  return new Set([
+    ...columnSiblings(index),
+    ...rowSiblings(index),
+    ...squareSiblings(index),
+  ]);
+}
+
+export {
+  type Cell,
+  DIGITS,
+  type Digit,
+  LEVELS,
+  type Level,
+  generatePuzzle,
+  siblingsOf,
+};
