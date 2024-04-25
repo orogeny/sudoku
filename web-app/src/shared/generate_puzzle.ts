@@ -1,4 +1,4 @@
-import { Cell, Level, isDigit } from "./common";
+import { Cell, Level, digitsFromString } from "./common";
 
 const puzzles = {
   Easy: ".12846.97..62....4.54973.212631984.51..72593....6..8.2.8..17..96..4891.3....6....",
@@ -12,11 +12,11 @@ const puzzles = {
 };
 
 function generatePuzzle(level: Level) {
-  return puzzles[level].split("").map((v) => {
-    if (isDigit(v)) {
-      return { kind: "given", digit: v };
+  return digitsFromString(puzzles[level]).map((d) => {
+    if (d === ".") {
+      return { kind: "empty" };
     }
-    return { kind: "empty" };
+    return { kind: "given", digit: d };
   }) as Cell[];
 }
 
