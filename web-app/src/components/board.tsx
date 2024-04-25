@@ -1,4 +1,5 @@
-import { Cell, DIGITS, Digit, siblingsOf } from "../utils/generate_puzzle";
+import { Cell, DIGITS, Digit } from "../shared/common";
+import { cellSiblings } from "../shared/cell_siblings";
 import "./board.css";
 
 type BoardProps = {
@@ -20,7 +21,7 @@ function Board({
     }
   };
 
-  const siblings = siblingsOf(selectedIndex);
+  const siblings = cellSiblings(selectedIndex);
 
   return (
     <div className="board grid aspect-square grid-cols-9 grid-rows-9">
@@ -32,9 +33,9 @@ function Board({
             selectedIndex === i
               ? "bg-yellow-200"
               : "digit" in content && content.digit === selectedDigit
-                ? "bg-gray-400"
+                ? "bg-gray-300"
                 : siblings.has(i)
-                  ? "bg-gray-200"
+                  ? "bg-gray-100"
                   : "bg-white"
           }`}
         >
@@ -66,7 +67,7 @@ function Board({
 function Given({ digit, selected }: { digit: Digit; selected: boolean }) {
   return (
     <span
-      className={`text-5xl text-black ${selected ? "font-semibold" : "font-light"}`}
+      className={`text-4xl text-slate-700 ${selected ? "font-semibold" : "font-normal"}`}
     >
       {digit}
     </span>
@@ -76,7 +77,7 @@ function Given({ digit, selected }: { digit: Digit; selected: boolean }) {
 function Proposed({ digit, selected }: { digit: Digit; selected: boolean }) {
   return (
     <span
-      className={`text-5xl text-blue-700 ${selected ? "font-semibold" : "font-normal"}`}
+      className={`text-4xl text-blue-600 ${selected ? "font-semibold" : "font-normal"}`}
     >
       {digit}
     </span>
@@ -87,7 +88,7 @@ function Note({
   digits,
   selectedDigit,
 }: {
-  digits: Digit[];
+  digits: Set<Digit>;
   selectedDigit?: Digit;
 }) {
   return (
@@ -97,7 +98,7 @@ function Note({
           key={d}
           className={`text-sm ${selectedDigit === d ? "font-bold" : "font-normal"}`}
         >
-          {digits.includes(d) ? d : null}
+          {digits.has(d) ? d : null}
         </span>
       ))}
     </div>

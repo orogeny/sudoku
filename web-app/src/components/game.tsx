@@ -1,7 +1,8 @@
 import { useReducer } from "react";
-import { Cell, Digit, Level, generatePuzzle } from "./../utils/generate_puzzle";
 import { Board } from "./board";
 import { DigitPad } from "./digit_pad";
+import { Cell, Digit, Level } from "../shared/common";
+import { generatePuzzle } from "../shared/generate_puzzle";
 
 type GameState = {
   level: Level;
