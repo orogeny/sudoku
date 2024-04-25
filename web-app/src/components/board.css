@@ -1,0 +1,31 @@
+/* Board and Cell border styling                                           */
+/* Grid and cell layout is done in component                               */
+/* But Tailwind currently uses unwieldly arbitary attributes for nth-child */
+
+/* cell borders */
+.board > div {
+  border-right: 1px solid #d1d5db;
+  border-bottom: 1px solid #d1d5db;
+}
+
+/* left border */
+.board > div:nth-child(9n + 1) {
+  border-left: 2px solid #9ca3af;
+}
+
+/* vertical divides and right border */
+.board > div:nth-child(3n) {
+  border-right: 2px solid #9ca3af;
+}
+
+/* top border */
+.board > div:nth-child(-n + 9) {
+  border-top: 2px solid #9ca3af;
+}
+
+/* horizontal divides and bottom border */
+.board > div:nth-child(n + 19):nth-child(-n + 27),
+div:nth-child(n + 46):nth-child(-n + 54),
+div:nth-child(n + 73) {
+  border-bottom: 2px solid #9ca3af;
+}

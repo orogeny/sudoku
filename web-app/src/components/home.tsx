@@ -1,7 +1,9 @@
+import { Game } from "./game";
+
 function Home() {
   return (
-    <main className="grow flex flex-col justify-center items-center">
-      <p className="text-blue-400 text-3xl">Home page says {'"Hello!"'}</p>
+    <main className="flex grow flex-col items-center justify-center">
+      <Game level={"Medium"} />
     </main>
   );
 }
