@@ -89,9 +89,12 @@ function reducer(state: GameState, action: GameAction) {
       digit: action.payload.digit,
     } as Cell;
 
-    const updatedCells = [
-      ...state.cells.splice(state.selectedIndex, 1, proposed),
-    ];
+    const updatedCells = state.cells.map((c, i) => {
+      if (i === state.selectedIndex) {
+        return proposed;
+      }
+      return c;
+    });
 
     const newState = {
       ...state,
@@ -99,8 +102,6 @@ function reducer(state: GameState, action: GameAction) {
       selectedDigit: undefined,
       selectedIndex: undefined,
     };
-
-    console.log("we should have cancelled the select:", newState.selectedIndex);
 
     return newState;
   }
@@ -116,14 +117,8 @@ function Game({ level }: { level: Level }) {
   };
 
   const handleDigitPadClick = (digit: Digit) => {
-    console.log("DigitPad clicked:", digit);
     dispatch({ type: "digit_clicked", payload: { digit } });
   };
-
-  console.log(
-    "We should have cancelled the selected cell:",
-    state.selectedIndex,
-  );
 
   return (
     <div className="flex grow self-stretch">
@@ -132,9 +127,9 @@ function Game({ level }: { level: Level }) {
           cells={state.cells}
           selectedDigit={state.selectedDigit}
           selectedIndex={state.selectedIndex}
-          cellClickHandler={handleCellClick}
+          clickHandler={handleCellClick}
         />
-        <DigitPad digitClickHandler={handleDigitPadClick} />
+        <DigitPad clickHandler={handleDigitPadClick} />
       </div>
     </div>
   );

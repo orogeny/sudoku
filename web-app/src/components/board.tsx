@@ -5,16 +5,20 @@ type BoardProps = {
   cells: Cell[];
   selectedDigit?: Digit;
   selectedIndex?: number;
-  cellClickHandler: (index: number) => void;
+  clickHandler?: (index: number) => void;
 };
 
 function Board({
   cells,
   selectedDigit,
   selectedIndex,
-  cellClickHandler,
+  clickHandler,
 }: BoardProps) {
-  console.log("Board::selectedIndex:", selectedIndex);
+  const handleClick = (index: number) => {
+    if (clickHandler) {
+      clickHandler(index);
+    }
+  };
 
   const siblings = siblingsOf(selectedIndex);
 
@@ -22,7 +26,7 @@ function Board({
     <div className="board grid aspect-square grid-cols-9 grid-rows-9">
       {cells.map((content, i) => (
         <div
-          onClick={() => cellClickHandler(i)}
+          onClick={() => handleClick(i)}
           key={i}
           className={`flex flex-col items-center justify-center ${
             selectedIndex === i
