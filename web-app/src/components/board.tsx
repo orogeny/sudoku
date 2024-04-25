@@ -1,25 +1,35 @@
-import { DIGITS, Digit } from "../utils/generate_puzzle";
+import { Cell, DIGITS, Digit, siblingsOf } from "../utils/generate_puzzle";
 import "./board.css";
-import { GameState } from "./game";
 
 type BoardProps = {
-  game: GameState;
+  cells: Cell[];
+  selectedDigit?: Digit;
+  selectedIndex?: number;
   cellClickHandler: (index: number) => void;
 };
 
-function Board({ game, cellClickHandler }: BoardProps) {
+function Board({
+  cells,
+  selectedDigit,
+  selectedIndex,
+  cellClickHandler,
+}: BoardProps) {
+  console.log("Board::selectedIndex:", selectedIndex);
+
+  const siblings = siblingsOf(selectedIndex);
+
   return (
     <div className="board grid aspect-square grid-cols-9 grid-rows-9">
-      {game.cells.map((content, i) => (
+      {cells.map((content, i) => (
         <div
           onClick={() => cellClickHandler(i)}
           key={i}
           className={`flex flex-col items-center justify-center ${
-            game.selectedIndex === i
+            selectedIndex === i
               ? "bg-yellow-200"
-              : "digit" in content && content.digit === game.selectedDigit
+              : "digit" in content && content.digit === selectedDigit
                 ? "bg-gray-400"
-                : game.siblings.has(i)
+                : siblings.has(i)
                   ? "bg-gray-200"
                   : "bg-white"
           }`}
@@ -29,19 +39,19 @@ function Board({ game, cellClickHandler }: BoardProps) {
           {content.kind === "given" && (
             <Given
               digit={content.digit}
-              selected={content.digit === game.selectedDigit}
+              selected={content.digit === selectedDigit}
             />
           )}
 
           {content.kind === "proposed" && (
             <Proposed
               digit={content.digit}
-              selected={content.digit === game.selectedDigit}
+              selected={content.digit === selectedDigit}
             />
           )}
 
           {content.kind === "note" && (
-            <Note digits={content.digits} selectedDigit={game.selectedDigit} />
+            <Note digits={content.digits} selectedDigit={selectedDigit} />
           )}
         </div>
       ))}

@@ -47,7 +47,6 @@ const puzzles = {
 function generatePuzzle(level: Level) {
   return puzzles[level].split("").map((v, i) => {
     if (i === 6) return { kind: "note", digits: ["2", "7"] } as Cell;
-    if (i === 15) return { kind: "proposed", digit: "3" } as Cell;
     return isDigit(v) ? { kind: "given", digit: v } : { kind: "empty" };
   }) as Cell[];
 }
@@ -76,7 +75,9 @@ function squareSiblings(index: number) {
   );
 }
 
-function siblingsOf(index: number) {
+function siblingsOf(index?: number) {
+  if (index === undefined) return new Set<number>();
+
   return new Set([
     ...columnSiblings(index),
     ...rowSiblings(index),

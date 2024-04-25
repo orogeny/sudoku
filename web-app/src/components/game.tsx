@@ -1,11 +1,5 @@
 import { useReducer } from "react";
-import {
-  Cell,
-  Digit,
-  Level,
-  generatePuzzle,
-  siblingsOf,
-} from "./../utils/generate_puzzle";
+import { Cell, Digit, Level, generatePuzzle } from "./../utils/generate_puzzle";
 import { Board } from "./board";
 import { DigitPad } from "./digit_pad";
 
@@ -14,15 +8,21 @@ type GameState = {
   cells: Cell[];
   selectedDigit?: Digit;
   selectedIndex?: number;
-  siblings: Set<number>;
 };
 
-type GameAction = {
-  type: "cell_clicked";
-  payload: {
-    cellIndex: number;
-  };
-};
+type GameAction =
+  | {
+      type: "cell_clicked";
+      payload: {
+        cellIndex: number;
+      };
+    }
+  | {
+      type: "digit_clicked";
+      payload: {
+        digit: Digit;
+      };
+    };
 
 function setupGame(level: Level): GameState {
   return {
@@ -30,7 +30,6 @@ function setupGame(level: Level): GameState {
     cells: generatePuzzle(level),
     selectedDigit: undefined,
     selectedIndex: undefined,
-    siblings: new Set<number>(),
   };
 }
 
@@ -53,20 +52,57 @@ function reducer(state: GameState, action: GameAction) {
         ...state,
         selectedDigit,
         selectedIndex,
-        siblings: siblingsOf(selectedIndex),
-      };
-
-      return newState;
-    } else {
-      const newState = {
-        ...state,
-        selectedDigit: undefined,
-        selectedIndex: undefined,
-        siblings: new Set<number>(),
       };
 
       return newState;
     }
+
+    const newState = {
+      ...state,
+      selectedDigit: undefined,
+      selectedIndex: undefined,
+    };
+
+    return newState;
+  }
+
+  if (action.type === "digit_clicked") {
+    if (
+      state.selectedIndex === undefined ||
+      state.cells[state.selectedIndex].kind === "given"
+    ) {
+      // Ignore digit pad if no cell selected or it was given
+      return state;
+    }
+
+    // Replace existing cell value with new value
+    const cell = state.cells[state.selectedIndex];
+
+    if (cell.kind === "proposed" && cell.digit === action.payload.digit) {
+      // Ignore when cell already contains that digit
+      return state;
+    }
+
+    // Replace existing cell with proposed digit
+    const proposed = {
+      kind: "proposed",
+      digit: action.payload.digit,
+    } as Cell;
+
+    const updatedCells = [
+      ...state.cells.splice(state.selectedIndex, 1, proposed),
+    ];
+
+    const newState = {
+      ...state,
+      cells: updatedCells,
+      selectedDigit: undefined,
+      selectedIndex: undefined,
+    };
+
+    console.log("we should have cancelled the select:", newState.selectedIndex);
+
+    return newState;
   }
 
   return state;
@@ -79,11 +115,26 @@ function Game({ level }: { level: Level }) {
     dispatch({ type: "cell_clicked", payload: { cellIndex: index } });
   };
 
+  const handleDigitPadClick = (digit: Digit) => {
+    console.log("DigitPad clicked:", digit);
+    dispatch({ type: "digit_clicked", payload: { digit } });
+  };
+
+  console.log(
+    "We should have cancelled the selected cell:",
+    state.selectedIndex,
+  );
+
   return (
     <div className="flex grow self-stretch">
       <div className="flex flex-col gap-4">
-        <Board game={state} cellClickHandler={handleCellClick} />
-        <DigitPad />
+        <Board
+          cells={state.cells}
+          selectedDigit={state.selectedDigit}
+          selectedIndex={state.selectedIndex}
+          cellClickHandler={handleCellClick}
+        />
+        <DigitPad digitClickHandler={handleDigitPadClick} />
       </div>
     </div>
   );
