@@ -24,12 +24,12 @@ function Board({
   const siblings = cellSiblings(selectedIndex);
 
   return (
-    <div className="board grid aspect-square grid-cols-9 grid-rows-9">
+    <div className="board grid aspect-square max-w-3xl grid-cols-9 grid-rows-9">
       {cells.map((content, i) => (
         <div
           onClick={() => handleClick(i)}
           key={i}
-          className={`flex flex-col items-center justify-center ${
+          className={`flex min-w-16 flex-col items-center justify-center ${
             selectedIndex === i
               ? "bg-yellow-200"
               : "digit" in content && content.digit === selectedDigit

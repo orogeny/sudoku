@@ -12,7 +12,7 @@ function DigitPad({ clickHandler }: { clickHandler?: (digit: Digit) => void }) {
       {DIGITS.map((d) => (
         <button
           key={d}
-          className="flex aspect-square flex-col items-center justify-center rounded-lg bg-sky-200 p-3 text-3xl font-bold text-slate-600 shadow-sm hover:bg-sky-300 hover:shadow-md active:bg-sky-400 active:opacity-100 active:shadow-none"
+          className="flex aspect-square min-w-14 flex-col items-center justify-center rounded-lg bg-sky-200 p-2.5 text-2xl font-bold text-slate-600 shadow-sm hover:bg-sky-300 hover:shadow-md active:bg-sky-400 active:opacity-100 active:shadow-none"
           onClick={() => handleClick(d)}
         >
           {d}
