@@ -92,7 +92,7 @@ function Note({
   selectedDigit?: Digit;
 }) {
   return (
-    <div className="grid aspect-square grow grid-cols-3 grid-rows-3 pl-2">
+    <div className="grid aspect-square grow grid-cols-3 grid-rows-3 pl-2 pt-px">
       {DIGITS.map((d) => (
         <span
           key={d}
