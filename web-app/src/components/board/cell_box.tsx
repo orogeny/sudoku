@@ -40,7 +40,7 @@ function Note({
   selectedDigit?: Digit;
 }) {
   return (
-    <div className="gird aspect-square grow grid-cols-3 grid-rows-3 pl-2 pt-px">
+    <div className="ml-2 mt-px grid aspect-square grow grid-cols-3 grid-rows-3 self-stretch">
       {DIGITS.map((d) => (
         <span
           key={d}
