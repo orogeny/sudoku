@@ -1,7 +1,7 @@
-import { describe, expect, test } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { DigitPad } from "./digit_pad";
+import { describe, expect, test } from "vitest";
 import { Digit } from "../shared/common";
+import { DigitPad } from "./digit_pad";
 
 describe("DigitPad", () => {
   test("displays numbers 1-9", () => {

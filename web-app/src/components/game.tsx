@@ -1,21 +1,22 @@
 import { useReducer } from "react";
-import { Board } from "./board";
+import { cellDigit } from "../shared/cell_digit";
+import { Cell, Digit, digitsFromString, isDigit } from "../shared/common";
+import { Board } from "./board/board";
 import { DigitPad } from "./digit_pad";
-import { Cell, Digit, Level } from "../shared/common";
-import { generatePuzzle } from "../shared/generate_puzzle";
+import { ToggleableButton } from "./toggleable_button";
 
 type GameState = {
-  level: Level;
   cells: Cell[];
   selectedDigit?: Digit;
   selectedIndex?: number;
+  notesToggled: boolean;
 };
 
 type GameAction =
   | {
       type: "cell_clicked";
       payload: {
-        cellIndex: number;
+        index: number;
       };
     }
   | {
@@ -23,115 +24,152 @@ type GameAction =
       payload: {
         digit: Digit;
       };
+    }
+  | {
+      type: "notes_toggled";
     };
 
-function setupGame(level: Level): GameState {
+function setup(puzzle: string) {
+  const cells = digitsFromString(puzzle).map((d) => {
+    if (isDigit(d)) {
+      return { kind: "given", digit: d };
+    }
+    return { kind: "empty" };
+  }) as Cell[];
+
   return {
-    level,
-    cells: generatePuzzle(level),
+    cells,
     selectedDigit: undefined,
     selectedIndex: undefined,
-  };
+    notesToggled: false,
+  } as GameState;
 }
 
 function reducer(state: GameState, action: GameAction) {
-  if (action.type === "cell_clicked") {
-    if (
-      state.selectedIndex === undefined ||
-      state.selectedIndex !== action.payload.cellIndex
-    ) {
-      const selectedIndex = action.payload.cellIndex;
+  const { type } = action;
 
-      const selectedCell = state.cells[selectedIndex];
+  // ---------- cell_clicked ----------
 
-      const selectedDigit =
-        selectedCell.kind === "given" || selectedCell.kind === "proposed"
-          ? selectedCell.digit
-          : undefined;
+  if (type === "cell_clicked") {
+    const { index } = action.payload;
+    const { cells, selectedIndex } = state;
 
-      const newState = {
-        ...state,
-        selectedDigit,
-        selectedIndex,
-      };
-
-      return newState;
+    if (selectedIndex === index) {
+      return { ...state, selectedDigit: undefined, selectedIndex: undefined };
     }
 
-    const newState = {
+    return {
       ...state,
-      selectedDigit: undefined,
-      selectedIndex: undefined,
+      selectedDigit: cellDigit(cells, index),
+      selectedIndex: index,
     };
-
-    return newState;
   }
 
-  if (action.type === "digit_clicked") {
-    if (
-      state.selectedIndex === undefined ||
-      state.cells[state.selectedIndex].kind === "given"
-    ) {
-      // Ignore digit pad if no cell selected or it was given
+  // ---------- digit_clicked ----------
+
+  if (type === "digit_clicked") {
+    const { digit } = action.payload;
+    const { cells, selectedIndex } = state;
+
+    if (selectedIndex === undefined) {
       return state;
     }
 
-    // Replace existing cell value with new value
-    const cell = state.cells[state.selectedIndex];
+    // We have a cell selected, should we replace its digit
+    const cell = cells[selectedIndex];
 
-    if (cell.kind === "proposed" && cell.digit === action.payload.digit) {
-      // Ignore when cell already contains that digit
-      return state;
+    if (cell.kind === "given") {
+      // Clear selection but highlight given digit
+      return {
+        ...state,
+        selectedDigit: digit,
+        selectedIndex: undefined,
+      };
     }
 
-    // Replace existing cell with proposed digit
-    const proposed = {
-      kind: "proposed",
-      digit: action.payload.digit,
-    } as Cell;
+    if (state.notesToggled) {
+      if (cell.kind === "proposed") {
+        // Clear selection but hightlight existing proposed digit
+        return {
+          ...state,
+          selectedDigit: digit,
+          selectedIndex: undefined,
+        };
+      }
 
-    const updatedCells = state.cells.map((c, i) => {
-      if (i === state.selectedIndex) {
-        return proposed;
+      const notes =
+        cell.kind === "note" ? new Set(cell.digits) : new Set<Digit>();
+
+      notes.has(digit) ? notes.delete(digit) : notes.add(digit);
+
+      const updatedCells = cells.map((c, i) => {
+        if (selectedIndex === i) {
+          return { kind: "note", digits: notes } as Cell;
+        }
+        return c;
+      });
+
+      return {
+        ...state,
+        cells: updatedCells,
+      };
+    }
+
+    // We are not taking notes and cell isn't given, so replace cell
+    const updatedCells = cells.map((c, i) => {
+      if (selectedIndex === i) {
+        return { kind: "proposed", digit } as Cell;
       }
       return c;
     });
 
-    const newState = {
+    return {
       ...state,
       cells: updatedCells,
-      selectedDigit: undefined,
-      selectedIndex: undefined,
     };
+  }
 
-    return newState;
+  // ---------- notes_toggled ----------
+
+  if (type === "notes_toggled") {
+    return { ...state, notesToggled: !state.notesToggled };
   }
 
   return state;
 }
 
-function Game({ level }: { level: Level }) {
-  const [state, dispatch] = useReducer(reducer, level, setupGame);
+function Game({ puzzle }: { puzzle: string }) {
+  const [state, dispatch] = useReducer(reducer, puzzle, setup);
 
   const handleCellClick = (index: number) => {
-    dispatch({ type: "cell_clicked", payload: { cellIndex: index } });
+    dispatch({ type: "cell_clicked", payload: { index } });
   };
 
   const handleDigitPadClick = (digit: Digit) => {
     dispatch({ type: "digit_clicked", payload: { digit } });
   };
 
+  const handleNotesClick = () => {
+    dispatch({ type: "notes_toggled" });
+  };
+
   return (
-    <div className="flex grow self-stretch">
-      <div className="flex flex-col gap-4">
-        <Board
-          cells={state.cells}
-          selectedDigit={state.selectedDigit}
-          selectedIndex={state.selectedIndex}
-          clickHandler={handleCellClick}
-        />
-        <DigitPad clickHandler={handleDigitPadClick} />
+    <div className="flex flex-col items-center gap-4 pt-4">
+      <div className="ml-10 flex flex-row justify-start gap-2 self-stretch">
+        <ToggleableButton
+          className="flex flex-row justify-between gap-4 py-3"
+          onClick={handleNotesClick}
+        >
+          Notes
+        </ToggleableButton>
       </div>
+      <Board
+        cells={state.cells}
+        selectedDigit={state.selectedDigit}
+        selectedIndex={state.selectedIndex}
+        clickHandler={handleCellClick}
+      />
+      <DigitPad clickHandler={handleDigitPadClick} />
     </div>
   );
 }

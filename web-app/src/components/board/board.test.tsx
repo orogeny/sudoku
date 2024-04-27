@@ -1,6 +1,6 @@
-import { describe, expect, test } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { Cell, Digit } from "../shared/common";
+import { describe, expect, test } from "vitest";
+import { Cell, Digit } from "../../shared/common";
 import { Board } from "./board";
 
 function emptyCells() {
