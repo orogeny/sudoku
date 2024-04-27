@@ -1,8 +1,8 @@
-import { Cell, DIGITS, Digit } from "../../shared/common";
-import { cellSiblings } from "../../shared/cell_siblings";
-import "./board.css";
-import { twMerge } from "tw-merge";
 import clsx, { ClassValue } from "clsx";
+import { twMerge } from "tw-merge";
+import { cellSiblings } from "../../shared/cell_siblings";
+import { Cell, Digit } from "../../shared/common";
+import "./board.css";
 import { Empty, Given, Note, Proposed } from "./cell_box";
 
 type BoardProps = {

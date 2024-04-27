@@ -7,10 +7,6 @@ const PUZZLE =
   "9...1.248.1.65...........6.8.4.9..3.56....827.718....4......5.3..3.764.2.9..8....";
 
 describe("Game", () => {
-  // let cells: Cell[];
-  // let notes_button: HTMLButtonElement;
-  // let digit_buttons: HTMLButtonElement;
-
   test("initial given", () => {
     render(<Game puzzle={PUZZLE} />);
 

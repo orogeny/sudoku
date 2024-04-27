@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { Cell, Digit } from "./common";
 import { cellDigit } from "./cell_digit";
+import { Cell, Digit } from "./common";
 
 describe("cellDigit", () => {
   test("empty", () => {

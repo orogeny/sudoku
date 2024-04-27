@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
-import { Empty, Given, Note, Proposed } from "./cell_box";
 import { Digit } from "../../shared/common";
+import { Empty, Given, Note, Proposed } from "./cell_box";
 
 describe("Cell components", () => {
   test("Empty", () => {
