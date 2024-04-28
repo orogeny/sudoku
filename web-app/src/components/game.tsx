@@ -5,7 +5,6 @@ import { Board } from "./board/board";
 import { DigitPad } from "./digit_pad";
 import { ToggleableButton } from "./toggleable_button";
 import { Stack } from "../shared/stack";
-import { number } from "zod";
 
 type GameState = {
   cells: Cell[];
@@ -106,6 +105,13 @@ function reducer(state: GameState, action: GameAction) {
         };
       }
 
+      const replaced = {
+        index: selectedIndex,
+        cell: state.cells[selectedIndex],
+      };
+
+      const updatedChanges = state.changes.push(replaced);
+
       const notes =
         cell.kind === "note" ? new Set(cell.digits) : new Set<Digit>();
 
@@ -121,20 +127,16 @@ function reducer(state: GameState, action: GameAction) {
       return {
         ...state,
         cells: updatedCells,
+        changes: updatedChanges,
       };
     }
 
     // We are not taking notes and cell isn't given, so replace cell
-    const proposed = { kind: "proposed", digit } as Cell;
-
     const replaced = { index: selectedIndex, cell: state.cells[selectedIndex] };
-
-    console.log("replaced:", replaced);
-    console.log("with:", proposed);
 
     const updatedChanges = state.changes.push(replaced);
 
-    console.log("changes:", updatedChanges.traverse());
+    const proposed = { kind: "proposed", digit } as Cell;
 
     const updatedCells = cells.map((c, i) =>
       selectedIndex === i ? proposed : c,

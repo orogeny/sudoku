@@ -54,7 +54,21 @@ describe("Game", () => {
     expect(notes).toHaveLength(3);
   });
 
-  test("undo proposed", () => {
+  test("undo proposed -> empty", () => {
+    render(<Game puzzle={EMPTY_PUZZLE} />);
+
+    const cell_3 = screen.getByTestId("cell-3");
+    const digit_3_button = screen.getByRole("button", { name: "3" });
+    const undo_button = screen.getByRole("button", { name: /undo/i });
+
+    fireEvent.click(cell_3);
+    fireEvent.click(digit_3_button);
+    fireEvent.click(undo_button);
+
+    expect(cell_3).toHaveTextContent("");
+  });
+
+  test("undo proposed -> proposed", () => {
     render(<Game puzzle={EMPTY_PUZZLE} />);
 
     const cell_2 = screen.getByTestId("cell-2");
@@ -71,5 +85,49 @@ describe("Game", () => {
     fireEvent.click(undo_button);
 
     expect(cell_2).toHaveTextContent("6");
+  });
+
+  test("undo note -> proposed", () => {
+    render(<Game puzzle={EMPTY_PUZZLE} />);
+
+    const cell_80 = screen.getByTestId("cell-80");
+    const digit_1_button = screen.getByRole("button", { name: /1/ });
+    const digit_9_button = screen.getByRole("button", { name: /9/ });
+
+    const notes_button = screen.getByRole("button", { name: /notes/i });
+    const undo_button = screen.getByRole("button", { name: /undo/i });
+
+    fireEvent.click(cell_80);
+    fireEvent.click(notes_button);
+    fireEvent.click(digit_1_button); // add 1 to cell's notes
+
+    fireEvent.click(notes_button); // toggle out of notes mode
+    fireEvent.click(digit_9_button); // replace cell's notes with proposed 9
+
+    fireEvent.click(undo_button); // undo proposed 9
+
+    expect(cell_80).toHaveTextContent("1");
+  });
+
+  test("undo note -> empty", () => {
+    render(<Game puzzle={EMPTY_PUZZLE} />);
+
+    const cell_80 = screen.getByTestId("cell-80");
+    const digit_1_button = screen.getByRole("button", { name: /1/ });
+    const digit_9_button = screen.getByRole("button", { name: /9/ });
+
+    const notes_button = screen.getByRole("button", { name: /notes/i });
+    const undo_button = screen.getByRole("button", { name: /undo/i });
+
+    fireEvent.click(cell_80);
+    fireEvent.click(notes_button);
+    fireEvent.click(digit_1_button); // add 1 to cell's notes
+
+    fireEvent.click(notes_button); // toggle out of notes mode
+    fireEvent.click(digit_9_button); // replace cell's notes with proposed 9
+
+    fireEvent.click(undo_button); // undo proposed 9
+
+    expect(cell_80).toHaveTextContent("1");
   });
 });
