@@ -1,10 +1,10 @@
 import { useReducer } from "react";
-import { cellDigit } from "../shared/cell_digit";
-import { Cell, Digit, digitsFromString, isDigit } from "../shared/common";
-import { Board } from "./board/board";
-import { DigitPad } from "./digit_pad";
-import { ToggleableButton } from "./toggleable_button";
-import { Stack } from "../shared/stack";
+import { cellDigit } from "../../shared/cell_digit";
+import { Cell, Digit, digitsFromString, isDigit } from "../../shared/common";
+import { Board } from "../board/board";
+import { DigitPad } from "../digit_pad";
+import { ToggleableButton } from "../toggleable_button";
+import { Stack } from "../../shared/stack";
 
 type GameState = {
   cells: Cell[];
