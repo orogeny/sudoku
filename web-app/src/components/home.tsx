@@ -1,5 +1,5 @@
 import { generatePuzzle } from "../shared/generate_puzzle";
-import { Game } from "./game/game";
+import { Game } from "./game";
 
 function Home() {
   return (
