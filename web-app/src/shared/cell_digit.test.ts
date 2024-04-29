@@ -12,7 +12,7 @@ describe("cellDigit", () => {
   test("note", () => {
     const note = {
       kind: "note",
-      digits: new Set<Digit>(["1", "3", "9"]),
+      digits: "139",
     } as Cell;
 
     expect(cellDigit(note)).toBeUndefined();
@@ -41,7 +41,7 @@ describe("cellDigit", () => {
       { kind: "empty" },
       { kind: "given", digit: "4" },
       { kind: "proposed", digit: "8" },
-      { kind: "note", digits: new Set<Digit>(["2", "5", "7"]) },
+      { kind: "note", digits: "257" },
     ] as Cell[];
 
     expect(cellDigit(list)).toBeUndefined();
