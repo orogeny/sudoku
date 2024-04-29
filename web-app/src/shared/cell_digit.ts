@@ -11,9 +11,9 @@ function cellDigit(xs: Cell | Cell[], index?: number) {
     if (index === undefined) {
       return undefined;
     }
-    cell = xs[index];
+    cell = xs[index]; // xs is an array
   } else {
-    cell = xs;
+    cell = xs; // xs is a Cell
   }
 
   if (cell.kind === "empty" || cell.kind === "note") {

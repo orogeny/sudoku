@@ -15,17 +15,18 @@ function isDigit(value: unknown): value is Digit {
   );
 }
 
-function digitsToString(digits: Digit[]) {
-  return digits.reduce(
-    (acc, d) => (isDigit(d) ? acc.concat(d) : acc.concat(".")),
-    "",
+function extractDigits(text: string) {
+  return text.split("").reduce(
+    (acc, c, i) => {
+      if (isDigit(c)) {
+        acc.digits.push(c);
+      } else {
+        acc.rejected.push(i);
+      }
+      return acc;
+    },
+    { digits: [] as Digit[], rejected: [] as number[] },
   );
-}
-
-function digitsFromString(text: string) {
-  return text.split("").map((v) => (isDigit(v) ? v : ".")) as Array<
-    Digit | "."
-  >;
 }
 
 type Cell =
@@ -38,9 +39,15 @@ type Cell =
     }
   | {
       kind: "note";
-      digits: Set<Digit>;
+      digits: string;
     };
 
-export { DIGITS, LEVELS, digitsFromString, digitsToString, isDigit };
-
-export type { Cell, Digit, Level };
+export {
+  DIGITS,
+  LEVELS,
+  extractDigits,
+  isDigit,
+  type Cell,
+  type Digit,
+  type Level,
+};
