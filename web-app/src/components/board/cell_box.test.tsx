@@ -1,6 +1,5 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
-import { Digit } from "../../shared/common";
 import { Empty, Given, Note, Proposed } from "./cell_box";
 
 describe("Cell components", () => {
@@ -31,15 +30,13 @@ describe("Cell components", () => {
   });
 
   test("Note - empty", () => {
-    render(<Note digits={new Set<Digit>()} selectedDigit={undefined} />);
+    render(<Note digits={""} selectedDigit={undefined} />);
 
     expect(screen.queryAllByText(/[A-z0-9]/)).toHaveLength(0);
   });
 
   test("Note - non selected", () => {
-    render(
-      <Note digits={new Set<Digit>(["2", "5", "8"])} selectedDigit={"4"} />,
-    );
+    render(<Note digits={"258"} selectedDigit={"4"} />);
 
     const visible = screen.getAllByText(/\b[2, 5, 8]\b/);
 
@@ -50,9 +47,7 @@ describe("Cell components", () => {
   });
 
   test("Note - one selected", () => {
-    render(
-      <Note digits={new Set<Digit>(["2", "5", "8"])} selectedDigit={"5"} />,
-    );
+    render(<Note digits={"258"} selectedDigit={"5"} />);
 
     const visible = screen.getAllByText(/\b[2, 5, 8]\b/);
 

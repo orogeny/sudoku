@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
-import { Cell, Digit } from "../../shared/common";
+import { Cell } from "../../shared/common";
 import { Board } from "./board";
 
 function emptyCells() {
@@ -43,7 +43,7 @@ describe("Board", () => {
   test("note digits", () => {
     const cells = emptyCells();
 
-    cells[3] = { kind: "note", digits: new Set<Digit>(["4", "7", "9"]) };
+    cells[3] = { kind: "note", digits: "947" };
 
     render(<Board cells={cells} />);
 

@@ -36,7 +36,7 @@ function Note({
   digits,
   selectedDigit,
 }: {
-  digits: Set<Digit>;
+  digits: string;
   selectedDigit?: Digit;
 }) {
   return (
@@ -48,7 +48,7 @@ function Note({
             "font-bold": selectedDigit === d,
           })}
         >
-          {digits.has(d) ? d : null}
+          {digits.includes(d) ? d : null}
         </span>
       ))}
     </div>

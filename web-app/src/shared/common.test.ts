@@ -1,11 +1,5 @@
 import { describe, expect, test } from "vitest";
-import {
-  DIGITS,
-  Digit,
-  digitsFromString,
-  digitsToString,
-  isDigit,
-} from "./common";
+import { DIGITS, extractDigits, isDigit } from "./common";
 
 describe("common - digits", () => {
   test("isDigit", () => {
@@ -22,17 +16,12 @@ describe("common - digits", () => {
     expect(isDigit(".")).toBe(false);
   });
 
-  test("digitsFromString", () => {
+  test("extractDigits", () => {
     const literal = "123456789abcdef";
 
-    const expected = (Array.from(DIGITS) as Array<Digit | ".">).concat(
-      ".".repeat(6).split("") as "."[],
-    );
+    const { digits, rejected } = extractDigits(literal);
 
-    expect(digitsFromString(literal)).toEqual(expected);
-  });
-
-  test("digitsToString", () => {
-    expect(digitsToString(Array.from(DIGITS))).toBe("123456789");
+    expect(digits).toEqual(DIGITS);
+    expect(rejected).toEqual([9, 10, 11, 12, 13, 14]);
   });
 });
