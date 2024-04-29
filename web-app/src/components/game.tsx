@@ -1,17 +1,15 @@
 import { useReducer } from "react";
-import { cellDigit } from "../../shared/cell_digit";
-import { Cell, Digit, digitsFromString, isDigit } from "../../shared/common";
-import { Board } from "../board/board";
-import { DigitPad } from "../digit_pad";
-import { ToggleableButton } from "../toggleable_button";
-import { Stack } from "../../shared/stack";
+import { cellDigit } from "../shared/cell_digit";
+import { Cell, Digit, digitsFromString, isDigit } from "../shared/common";
+import { Board } from "./board/board";
+import { DigitPad } from "./digit_pad";
+import { ToggleableButton } from "./toggleable_button";
 
 type GameState = {
   cells: Cell[];
   selectedDigit?: Digit;
   selectedIndex?: number;
   notesToggled: boolean;
-  changes: Stack<{ index: number; cell: Cell }>;
 };
 
 type GameAction =
@@ -28,13 +26,8 @@ type GameAction =
       };
     }
   | {
-      type: "notes_toggled" | "undo_clicked";
+      type: "notes_toggled";
     };
-
-type Change = {
-  index: number;
-  cell: Cell;
-};
 
 function setup(puzzle: string) {
   const cells = digitsFromString(puzzle).map((d) => {
@@ -49,7 +42,6 @@ function setup(puzzle: string) {
     selectedDigit: undefined,
     selectedIndex: undefined,
     notesToggled: false,
-    changes: new Stack<Change>(),
   } as GameState;
 }
 
@@ -97,20 +89,13 @@ function reducer(state: GameState, action: GameAction) {
 
     if (state.notesToggled) {
       if (cell.kind === "proposed") {
-        // Clear selection but highlight existing proposed digit
+        // Clear selection but hightlight existing proposed digit
         return {
           ...state,
           selectedDigit: digit,
           selectedIndex: undefined,
         };
       }
-
-      const replaced = {
-        index: selectedIndex,
-        cell: state.cells[selectedIndex],
-      };
-
-      const updatedChanges = state.changes.push(replaced);
 
       const notes =
         cell.kind === "note" ? new Set(cell.digits) : new Set<Digit>();
@@ -127,25 +112,20 @@ function reducer(state: GameState, action: GameAction) {
       return {
         ...state,
         cells: updatedCells,
-        changes: updatedChanges,
       };
     }
 
     // We are not taking notes and cell isn't given, so replace cell
-    const replaced = { index: selectedIndex, cell: state.cells[selectedIndex] };
-
-    const updatedChanges = state.changes.push(replaced);
-
-    const proposed = { kind: "proposed", digit } as Cell;
-
-    const updatedCells = cells.map((c, i) =>
-      selectedIndex === i ? proposed : c,
-    );
+    const updatedCells = cells.map((c, i) => {
+      if (selectedIndex === i) {
+        return { kind: "proposed", digit } as Cell;
+      }
+      return c;
+    });
 
     return {
       ...state,
       cells: updatedCells,
-      changes: updatedChanges,
     };
   }
 
@@ -153,24 +133,6 @@ function reducer(state: GameState, action: GameAction) {
 
   if (type === "notes_toggled") {
     return { ...state, notesToggled: !state.notesToggled };
-  }
-
-  // ---------- undo_clicked ----------
-
-  if (type === "undo_clicked") {
-    const { item, rest } = state.changes.pop();
-
-    if (item) {
-      const updatedCells = state.cells.map((c, i) =>
-        item.index === i ? item.cell : c,
-      );
-
-      return {
-        ...state,
-        cells: updatedCells,
-        changes: rest,
-      };
-    }
   }
 
   return state;
@@ -191,10 +153,6 @@ function Game({ puzzle }: { puzzle: string }) {
     dispatch({ type: "notes_toggled" });
   };
 
-  const handleUndoClick = () => {
-    dispatch({ type: "undo_clicked" });
-  };
-
   return (
     <div className="flex flex-col items-center gap-4 pt-4">
       <div className="ml-10 flex flex-row justify-start gap-2 self-stretch">
@@ -204,7 +162,6 @@ function Game({ puzzle }: { puzzle: string }) {
         >
           Notes
         </ToggleableButton>
-        <button onClick={handleUndoClick}>Undo</button>
       </div>
       <Board
         cells={state.cells}
