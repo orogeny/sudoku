@@ -2,11 +2,7 @@ import { generatePuzzle } from "../shared/generate_puzzle";
 import { Game } from "./game/game";
 
 function Home() {
-  return (
-    <main className="flex grow flex-col">
-      <Game puzzle={generatePuzzle("Hard")} />
-    </main>
-  );
+  return <Game puzzle={generatePuzzle("Hard")} />;
 }
 
 export { Home };
