@@ -17,6 +17,10 @@ class Stack<T> {
     return stack;
   }
 
+  pushAll(items: T[]) {
+    return items.reduce<Stack<T>>((acc, item) => acc.push(item), this);
+  }
+
   pop() {
     return { item: this.item, rest: this.rest ?? this } as Node<T>;
   }

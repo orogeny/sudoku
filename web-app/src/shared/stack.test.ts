@@ -33,4 +33,12 @@ describe("Stack", () => {
 
     expect(stored.traverse()).toEqual(["last in", "middles in", "first in"]);
   });
+
+  test("should push array of items and traverse in FILO order", () => {
+    const stack = new Stack();
+
+    const stored = stack.pushAll([1, 2, 3, 4]);
+
+    expect(stored.traverse()).toEqual([4, 3, 2, 1]);
+  });
 });
