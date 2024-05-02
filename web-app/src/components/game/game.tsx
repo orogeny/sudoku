@@ -1,10 +1,10 @@
-import { useReducer } from "react";
+import { useReducer, useState } from "react";
 import { cellDigit } from "../../shared/cell_digit";
-import { Cell, Digit, isDigit } from "../../shared/common";
+import { cellSiblings } from "../../shared/cell_siblings";
+import { cn } from "../../shared/cn";
+import { Cell, DIGITS, Digit, isDigit } from "../../shared/common";
 import { Stack } from "../../shared/stack";
-import { Board } from "../board/board";
-import { DigitPad } from "../digit_pad";
-import { ToggleableButton } from "../toggleable_button";
+import { Button, DigitButton, ToggleableButton } from "./buttons";
 
 type Change = {
   index: number;
@@ -54,8 +54,9 @@ function setup(puzzle: string) {
 }
 
 function reducer(state: GameState, action: GameAction) {
+  //
   // ---------- cell_clicked ----------
-
+  //
   if (action.type === "cell_clicked") {
     if (state.selectedIndex === action.payload.index) {
       // Cell was selected, so deselect it
@@ -74,8 +75,9 @@ function reducer(state: GameState, action: GameAction) {
     };
   }
 
+  //
   // ---------- digit_clicked ----------
-
+  //
   if (action.type === "digit_clicked") {
     if (state.selectedIndex === undefined) {
       // no cell is selected, there are no changes
@@ -213,14 +215,16 @@ function reducer(state: GameState, action: GameAction) {
     }
   } // end of digit_clicked
 
+  //
   // ---------- notes_toggled ----------
-
+  //
   if (action.type === "notes_toggled") {
     return { ...state, notesToggled: !state.notesToggled };
   }
 
+  //
   // ---------- undo_clicked ----------
-
+  //
   if (action.type === "undo_clicked") {
     const { item, rest } = state.changes.pop();
 
@@ -242,12 +246,15 @@ function reducer(state: GameState, action: GameAction) {
 
 function Game({ puzzle }: { puzzle: string }) {
   const [state, dispatch] = useReducer(reducer, puzzle, setup);
+  const [eraseMode, setEraseMode] = useState(false);
+
+  const siblings = cellSiblings(state.selectedIndex);
 
   const handleCellClick = (index: number) => {
     dispatch({ type: "cell_clicked", payload: { index } });
   };
 
-  const handleDigitPadClick = (digit: Digit) => {
+  const handleDigitClick = (digit: Digit) => {
     dispatch({ type: "digit_clicked", payload: { digit } });
   };
 
@@ -260,24 +267,138 @@ function Game({ puzzle }: { puzzle: string }) {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4 pt-4">
-      <div className="ml-10 flex flex-row justify-start gap-2 self-stretch">
-        <ToggleableButton
-          className="flex flex-row justify-between gap-4 py-3"
-          onClick={handleNotesClick}
+    <>
+      <main className="mx-auto flex min-w-[576px] max-w-[640px] flex-col gap-6 xl:max-w-fit xl:flex-row xl:gap-8">
+        <div className="grid grid-cols-4 gap-4 xl:order-2 xl:grid-cols-2 xl:gap-6 xl:self-end">
+          <ToggleableButton
+            className="xl:order-3"
+            onClick={handleNotesClick}
+            toggled={state.notesToggled}
+          >
+            <span>Notes</span>
+            <span>{state.notesToggled ? "on" : "off"}</span>
+          </ToggleableButton>
+
+          <Button className="xl:order-1" onClick={handleUndoClick}>
+            Undo
+          </Button>
+
+          <ToggleableButton
+            className="xl:order-4"
+            toggled={eraseMode}
+            onClick={() => setEraseMode((_) => !eraseMode)}
+          >
+            <span>Erase</span>
+            <span>{eraseMode ? "on" : "off"}</span>
+          </ToggleableButton>
+
+          <Button className="bg-blue-400 text-slate-100 hover:bg-blue-500 active:bg-blue-600 active:text-white xl:order-2">
+            Tip
+          </Button>
+        </div>
+
+        <div className="flex min-w-[576px] flex-col gap-6">
+          <div
+            className={cn(
+              "grid aspect-square grid-cols-9 grid-rows-9 shadow-sm",
+              "[&>div]:border-r",
+              "[&>div]:border-r-cool-gray-300",
+              "[&>div]:border-b",
+              "[&>div]:border-b-cool-gray-300",
+              "[&>div:nth-child(9n+1)]:border-l-2",
+              "[&>div:nth-child(9n+1)]:border-l-cool-gray-400",
+              "[&>div:nth-child(3n)]:border-r-2",
+              "[&>div:nth-child(3n)]:border-r-cool-gray-400",
+              "[&>div:nth-child(-n+9)]:border-t-2",
+              "[&>div:nth-child(-n+9)]:border-t-cool-gray-400",
+              "[&>div:nth-child(n+19):nth-child(-n+27)]:border-b-2",
+              "[&>div:nth-child(n+19):nth-child(-n+27)]:border-b-cool-gray-400",
+              "[&>div:nth-child(n+46):nth-child(-n+54)]:border-b-2",
+              "[&>div:nth-child(n+46):nth-child(-n+54)]:border-b-cool-gray-400",
+              "[&>div:nth-child(n+73)]:border-b-2",
+              "[&>div:nth-child(n+73)]:border-b-cool-gray-400",
+            )}
+          >
+            {state.cells.map((c, i) => (
+              <div
+                key={i}
+                data-testid={`cell-${i}`}
+                onClick={() => handleCellClick(i)}
+                className={cn(
+                  "grid grid-cols-1",
+                  { "bg-gray-100": siblings.has(i) },
+                  {
+                    "bg-zinc-300":
+                      "digit" in c && c.digit === state.highlightDigit,
+                  },
+                  { "bg-yellow-200": state.selectedIndex === i },
+                )}
+              >
+                <Content cell={c} highlightDigit={state.highlightDigit} />
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-2">
+            {DIGITS.map((d) => (
+              <DigitButton key={d} onClick={() => handleDigitClick(d)}>
+                {d}
+              </DigitButton>
+            ))}
+          </div>
+        </div>
+      </main>
+    </>
+  );
+}
+
+function Content({
+  cell,
+  highlightDigit,
+}: {
+  cell: Cell;
+  highlightDigit?: Digit;
+}) {
+  if (cell.kind === "empty") return null;
+
+  if (cell.kind === "given" || cell.kind === "proposed") {
+    return (
+      <div className="place-self-center">
+        <span
+          className={cn(
+            "text-4xl font-normal",
+            {
+              "font-semibold text-sky-500": cell.kind === "proposed",
+            },
+            {
+              "font-bold": highlightDigit === cell.digit,
+            },
+          )}
         >
-          Notes
-        </ToggleableButton>
-        <button onClick={handleUndoClick}>Undo</button>
+          {cell.digit}
+        </span>
       </div>
-      <Board
-        cells={state.cells}
-        selectedDigit={state.highlightDigit}
-        selectedIndex={state.selectedIndex}
-        clickHandler={handleCellClick}
-      />
-      <DigitPad clickHandler={handleDigitPadClick} />
-    </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="grid grid-cols-3 grid-rows-3">
+        {DIGITS.map((d) => (
+          <span
+            key={d}
+            className={cn(
+              "place-self-center text-sm font-normal text-slate-600",
+              {
+                "font-bold text-black": highlightDigit === d,
+              },
+            )}
+          >
+            {cell.kind === "note" && cell.digits.includes(d) ? d : null}
+          </span>
+        ))}
+      </div>
+    </>
   );
 }
 
