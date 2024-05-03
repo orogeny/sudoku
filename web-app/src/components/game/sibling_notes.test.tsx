@@ -1,8 +1,8 @@
 import "@testing-library/jest-dom/matchers";
-import { fireEvent, render, screen, within } from "@testing-library/react";
-import { Game } from "./game";
-import { Digit } from "../../shared/common";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
+import { Digit } from "../../shared/common";
+import { Game } from "./game";
 
 const PUZZLE =
   "9...1.248.1.65...........6.8.4.9..3.56....827.718....4......5.3..3.764.2.9..8....";
@@ -30,12 +30,6 @@ function setup(puzzle: string) {
     screen,
   };
 }
-
-// function getCellDigits(el: HTMLElement) {
-//   const inner = within(el).queryAllByText(/\b\d{1}\b/);
-
-//   return inner.map((x) => x.textContent);
-// }
 
 describe("Remove note digits from sibling cells", () => {
   test("should remove proposed digit from sibling notes", () => {
