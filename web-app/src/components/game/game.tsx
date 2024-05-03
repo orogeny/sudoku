@@ -176,6 +176,19 @@ function reducer(state: GameState, action: GameAction) {
         };
       }
 
+      //
+      // Place proposed digit into a cell with an existing proposed digit
+      //
+
+      const existingCell = state.cells[state.selectedIndex];
+      if (
+        existingCell.kind === "proposed" &&
+        existingCell.digit === action.payload.digit
+      ) {
+        // ignore proposing same digit multiple times
+        return state;
+      }
+
       // Replace existing proposed digit with a new one
       const updatedChanges = state.changes.push({
         index: state.selectedIndex,
