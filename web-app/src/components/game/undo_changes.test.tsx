@@ -79,6 +79,18 @@ describe("Undo", () => {
     expect(cells[1]).toHaveTextContent("3");
   });
 
+  test("should ignore same proposed digit", () => {
+    const { cells, digit_button, undo_button } = setup(PUZZLE);
+
+    fireEvent.click(cells[2]);
+    fireEvent.click(digit_button["5"]);
+    fireEvent.click(digit_button["5"]);
+
+    fireEvent.click(undo_button);
+
+    expect(cells[2]).toHaveTextContent("");
+  });
+
   test("should revert new note back to empty", () => {
     const { cells, digit_button, notes_button, undo_button } = setup(PUZZLE);
 
