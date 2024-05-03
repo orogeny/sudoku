@@ -352,8 +352,7 @@ function Game({ puzzle }: { puzzle: string }) {
             onClick={handleNotesClick}
             toggled={state.notesToggled}
           >
-            <span>Notes</span>
-            <span>{state.notesToggled ? "on" : "off"}</span>
+            Notes
           </ToggleableButton>
 
           <Button className="xl:order-1" onClick={handleUndoClick}>
@@ -365,8 +364,7 @@ function Game({ puzzle }: { puzzle: string }) {
             toggled={eraseMode}
             onClick={() => setEraseMode((_) => !eraseMode)}
           >
-            <span>Erase</span>
-            <span>{eraseMode ? "on" : "off"}</span>
+            Erase
           </ToggleableButton>
 
           <Button className="bg-blue-400 text-slate-100 hover:bg-blue-500 active:bg-blue-600 active:text-white xl:order-2">
