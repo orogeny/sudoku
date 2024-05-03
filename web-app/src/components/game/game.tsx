@@ -114,9 +114,26 @@ function reducer(state: GameState, action: GameAction) {
           cells: updatedCells,
           changes: updatedChanges,
         };
-      }
+      } // end of addning note to cell
 
-      const updatedChanges = state.changes.push({
+      //
+      // Place proposed digit into an empty cell
+      //
+
+      const siblingIndices = cellSiblings(state.selectedIndex);
+
+      siblingIndices.delete(state.selectedIndex);
+
+      const prunableIndices = Array.from(siblingIndices)
+        .filter((si) => state.cells[si].kind === "note")
+        .filter((si) => {
+          const cell = state.cells[si] as Cell;
+          if (cell.kind !== "note") return false;
+
+          return cell.digits.includes(action.payload.digit);
+        });
+
+      const change = state.changes.push({
         index: state.selectedIndex,
         cell: state.cells[state.selectedIndex],
       });
@@ -125,13 +142,28 @@ function reducer(state: GameState, action: GameAction) {
         if (state.selectedIndex === i) {
           return { kind: "proposed", digit: action.payload.digit };
         }
+        if (c.kind === "note") {
+          const notes = c.digits.includes(action.payload.digit)
+            ? c.digits.replace(action.payload.digit, "")
+            : c.digits.concat(action.payload.digit);
+
+          if (notes.length === 0) {
+            return { kind: "empty" };
+          }
+          return { kind: "note", digits: notes };
+        }
         return c;
       }) as Cell[];
 
       return {
         ...state,
         cells: updatedCells,
-        changes: updatedChanges,
+        changes: change.pushAll(
+          prunableIndices.map((pi) => ({
+            index: pi,
+            cell: state.cells[pi],
+          })),
+        ),
       };
     }
 

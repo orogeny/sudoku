@@ -27,7 +27,7 @@ describe("Stack", () => {
   });
 
   test("should traverse in FILO order", () => {
-    const stack = new Stack();
+    const stack = new Stack<string>();
 
     const stored = stack.push("first in").push("middles in").push("last in");
 
@@ -35,10 +35,20 @@ describe("Stack", () => {
   });
 
   test("should push array of items and traverse in FILO order", () => {
-    const stack = new Stack();
+    const stack = new Stack<number>();
 
     const stored = stack.pushAll([1, 2, 3, 4]);
 
     expect(stored.traverse()).toEqual([4, 3, 2, 1]);
+  });
+
+  test("should return same instance", () => {
+    const stack = new Stack<number>();
+
+    const updated = stack.push(1);
+
+    const noChanges = updated.pushAll([]);
+
+    expect(noChanges).toBe(updated);
   });
 });
