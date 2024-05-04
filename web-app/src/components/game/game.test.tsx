@@ -91,7 +91,7 @@ describe("Game", () => {
     expect(cells[1]).not.toHaveTextContent("3");
   });
 
-  test("should reject duplicateing sibling digit in empty cell", () => {
+  test("should reject duplicating sibling digit in empty cell", () => {
     const { cells, digit_button } = setup(PUZZLE);
 
     fireEvent.click(cells[1]);
@@ -111,6 +111,7 @@ describe("Game", () => {
     fireEvent.click(digit_button["5"]);
 
     expect(cells[1]).toHaveTextContent("3");
+    expect(cells[1]).not.toHaveTextContent("5");
   });
 
   test("should reject duplicating sibling digit in note cell", () => {

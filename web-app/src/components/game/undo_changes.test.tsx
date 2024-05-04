@@ -77,6 +77,7 @@ describe("Undo", () => {
     fireEvent.click(undo_button);
 
     expect(cells[1]).toHaveTextContent("3");
+    expect(cells[1]).not.toHaveTextContent("5");
   });
 
   test("should ignore same proposed digit", () => {
@@ -121,9 +122,11 @@ describe("Undo", () => {
     fireEvent.click(digit_button["5"]);
 
     expect(cells[1]).toHaveTextContent("5");
+    expect(cells[1]).not.toHaveTextContent("3");
 
     fireEvent.click(undo_button);
 
     expect(cells[1]).toHaveTextContent("3");
+    expect(cells[1]).not.toHaveTextContent("5");
   });
 });
