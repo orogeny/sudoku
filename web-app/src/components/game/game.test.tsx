@@ -88,5 +88,44 @@ describe("Game", () => {
     fireEvent.click(digit_button["5"]);
 
     expect(cells[1]).toHaveTextContent("5");
+    expect(cells[1]).not.toHaveTextContent("3");
+  });
+
+  test("should reject duplicateing sibling digit in empty cell", () => {
+    const { cells, digit_button } = setup(PUZZLE);
+
+    fireEvent.click(cells[1]);
+    fireEvent.click(digit_button["7"]);
+
+    expect(cells[1]).toHaveTextContent("");
+  });
+
+  test("should reject duplicating sibling digit in proposed cell", () => {
+    const { cells, digit_button } = setup(PUZZLE);
+
+    fireEvent.click(cells[20]);
+    fireEvent.click(digit_button["5"]);
+
+    fireEvent.click(cells[1]);
+    fireEvent.click(digit_button["3"]);
+    fireEvent.click(digit_button["5"]);
+
+    expect(cells[1]).toHaveTextContent("3");
+  });
+
+  test("should reject duplicating sibling digit in note cell", () => {
+    const { cells, digit_button, notes_button } = setup(PUZZLE);
+
+    fireEvent.click(notes_button);
+
+    fireEvent.click(cells[1]);
+    fireEvent.click(digit_button["5"]);
+
+    fireEvent.click(notes_button);
+
+    fireEvent.click(digit_button["6"]);
+
+    expect(cells[1]).toHaveTextContent("5");
+    expect(cells[1]).not.toHaveTextContent("6");
   });
 });

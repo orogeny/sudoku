@@ -1,4 +1,4 @@
-import { useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { cellDigit } from "../../shared/cell_digit";
 import { cellSiblings } from "../../shared/cell_siblings";
 import { cn } from "../../shared/cn";
@@ -15,6 +15,7 @@ type GameState = {
   cells: Cell[];
   highlightDigit?: Digit;
   selectedIndex?: number;
+  errorIndex?: number;
   notesToggled: boolean;
   changes: Stack<Change>;
 };
@@ -33,7 +34,7 @@ type GameAction =
       };
     }
   | {
-      type: "notes_toggled" | "undo_clicked";
+      type: "notes_toggled" | "undo_clicked" | "cell_error_handled";
     };
 
 function setup(puzzle: string) {
@@ -48,12 +49,28 @@ function setup(puzzle: string) {
     cells,
     highlightDigit: undefined,
     selectedIndex: undefined,
+    errorIndex: undefined,
     notesToggled: false,
     changes: new Stack<Change>(),
   };
 }
 
 function reducer(state: GameState, action: GameAction) {
+  //
+  // ---------- cell_error_handled ----------
+
+  if (action.type === "cell_error_handled") {
+    return {
+      ...state,
+      errorIndex: undefined,
+    };
+  }
+
+  if (state.errorIndex !== undefined) {
+    // take no further actions when we have an error
+    return state;
+  }
+
   //
   // ---------- cell_clicked ----------
   //
@@ -124,6 +141,18 @@ function reducer(state: GameState, action: GameAction) {
 
       siblingIndices.delete(state.selectedIndex);
 
+      const siblingDigits = Array.from(siblingIndices)
+        .map((si) => state.cells[si])
+        .map((c) => ("digit" in c ? c.digit : undefined))
+        .filter(isDigit);
+
+      if (siblingDigits.includes(action.payload.digit)) {
+        return {
+          ...state,
+          errorIndex: state.selectedIndex,
+        };
+      }
+
       const prunableIndices = Array.from(siblingIndices)
         .filter((si) => state.cells[si].kind === "note")
         .filter((si) => {
@@ -189,6 +218,22 @@ function reducer(state: GameState, action: GameAction) {
         return state;
       }
 
+      const siblingIndices = cellSiblings(state.selectedIndex);
+
+      siblingIndices.delete(state.selectedIndex);
+
+      const siblingDigits = Array.from(siblingIndices)
+        .map((si) => state.cells[si])
+        .map((c) => ("digit" in c ? c.digit : undefined))
+        .filter(isDigit);
+
+      if (siblingDigits.includes(action.payload.digit)) {
+        return {
+          ...state,
+          errorIndex: state.selectedIndex,
+        };
+      }
+
       // Replace existing proposed digit with a new one
       const updatedChanges = state.changes.push({
         index: state.selectedIndex,
@@ -247,6 +292,18 @@ function reducer(state: GameState, action: GameAction) {
       const siblingIndices = cellSiblings(state.selectedIndex);
 
       siblingIndices.delete(state.selectedIndex);
+
+      const siblingDigits = Array.from(siblingIndices)
+        .map((si) => state.cells[si])
+        .map((c) => ("digit" in c ? c.digit : undefined))
+        .filter(isDigit);
+
+      if (siblingDigits.includes(action.payload.digit)) {
+        return {
+          ...state,
+          errorIndex: state.selectedIndex,
+        };
+      }
 
       const prunableIndices = Array.from(siblingIndices)
         .filter((si) => state.cells[si].kind === "note")
@@ -325,6 +382,12 @@ function Game({ puzzle }: { puzzle: string }) {
   const [state, dispatch] = useReducer(reducer, puzzle, setup);
   const [eraseMode, setEraseMode] = useState(false);
 
+  useEffect(() => {
+    if (state.errorIndex !== undefined) {
+      setTimeout(handleCellError, 3000);
+    }
+  }, [state.errorIndex]);
+
   const siblings = cellSiblings(state.selectedIndex);
 
   const handleCellClick = (index: number) => {
@@ -341,6 +404,10 @@ function Game({ puzzle }: { puzzle: string }) {
 
   const handleUndoClick = () => {
     dispatch({ type: "undo_clicked" });
+  };
+
+  const handleCellError = () => {
+    dispatch({ type: "cell_error_handled" });
   };
 
   return (
@@ -407,6 +474,7 @@ function Game({ puzzle }: { puzzle: string }) {
                       "digit" in c && c.digit === state.highlightDigit,
                   },
                   { "bg-yellow-200": state.selectedIndex === i },
+                  { "bg-red-300": state.errorIndex === i },
                 )}
               >
                 <Content cell={c} highlightDigit={state.highlightDigit} />
