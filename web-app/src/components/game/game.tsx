@@ -406,7 +406,7 @@ function Game({ puzzle }: { puzzle: string }) {
 
   useEffect(() => {
     if (state.errorIndex !== undefined) {
-      setTimeout(handleCellError, 3000);
+      setTimeout(handleCellError, 300);
     }
   }, [state.errorIndex]);
 
