@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/matchers";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 import { Digit } from "../../shared/common";
 import { Game } from "./game";
