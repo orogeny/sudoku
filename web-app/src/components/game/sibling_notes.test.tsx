@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/matchers";
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 import { Digit } from "../../shared/common";
 import { Game } from "./game";
@@ -31,29 +31,24 @@ function setup(puzzle: string) {
   };
 }
 
-function getCellDigits(el: HTMLElement) {
-  return within(el)
-    .queryAllByText(/\b\d{1}\b/)
-    .map((il) => il.textContent)
-    .sort();
-}
-
 describe("Remove note digits from sibling cells", () => {
   test("should only prune sibling notes", () => {
     const { cells, digit_button, notes_button } = setup(PUZZLE);
 
     fireEvent.click(notes_button);
+
     fireEvent.click(cells[1]);
     fireEvent.click(digit_button["5"]);
 
     fireEvent.click(notes_button);
-    fireEvent.click(cells[80]);
+
+    fireEvent.click(cells[74]);
     fireEvent.click(digit_button["5"]);
 
     expect(cells[1]).toHaveTextContent("5");
   });
 
-  test("should remove proposed digit over note from sibling notes", () => {
+  test("should prune sibling notes when note becomes proposed", () => {
     const { cells, digit_button, notes_button } = setup(PUZZLE);
 
     fireEvent.click(notes_button);
@@ -71,10 +66,11 @@ describe("Remove note digits from sibling cells", () => {
     fireEvent.click(cells[1]);
     fireEvent.click(digit_button["5"]);
 
-    expect(getCellDigits(cells[2])).toEqual(["6", "7"]);
+    expect(cells[2]).toHaveTextContent("67");
+    expect(cells[2]).not.toHaveTextContent("5");
   });
 
-  test("should remove proposed placed in empty from sibling notes", () => {
+  test("should prune sibling notes when empty becomes proposed", () => {
     const { cells, digit_button, notes_button } = setup(PUZZLE);
 
     fireEvent.click(notes_button);
@@ -96,5 +92,24 @@ describe("Remove note digits from sibling cells", () => {
     expect(cells[19]).toHaveTextContent("");
     expect(cells[24]).toHaveTextContent("");
     expect(cells[35]).toHaveTextContent("");
+  });
+
+  test("should prune sibling notes when proposed replaced with different digit", () => {
+    const { cells, digit_button, notes_button } = setup(PUZZLE);
+
+    fireEvent.click(notes_button);
+    fireEvent.click(cells[2]);
+    fireEvent.click(digit_button["5"]);
+    fireEvent.click(digit_button["6"]);
+    fireEvent.click(digit_button["7"]);
+
+    fireEvent.click(notes_button);
+
+    fireEvent.click(cells[1]);
+    fireEvent.click(digit_button["3"]);
+
+    fireEvent.click(digit_button["5"]);
+
+    expect(cells[2]).not.toHaveTextContent("5");
   });
 });
