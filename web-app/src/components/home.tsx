@@ -1,4 +1,5 @@
-import { generatePuzzle } from "../shared/generate_puzzle";
+// import { generatePuzzle } from "../shared/generate_puzzle";
+import { generatePuzzle } from "./game/game_reducer";
 import { Game } from "./game/game";
 
 function Home() {
