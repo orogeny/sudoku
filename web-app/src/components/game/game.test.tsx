@@ -182,13 +182,24 @@ describe("digit toggled 'on'", () => {
     expect(cell[1]).toHaveTextContent("");
   });
 
-  test("should not allow duplicate digit in siblings", () => {
+  test("should not allow new proposed digit to clash with siblings", () => {
     const { cell, digit } = TEST_GAME;
 
     fireEvent.click(digit["4"]);
     fireEvent.click(cell[2]);
 
     expect(cell[2]).toHaveTextContent("");
+  });
+
+  test("should not allow replacing proposed digit clashing with siblings", () => {
+    const { cell, digit } = TEST_GAME;
+
+    fireEvent.click(cell[3]);
+    fireEvent.click(digit["3"]);
+
+    fireEvent.click(digit["8"]);
+
+    expect(cell[3]).toHaveTextContent("3");
   });
 });
 
@@ -328,5 +339,82 @@ describe("notes toggled: on, digit toggled: off", () => {
     fireEvent.click(digit["7"]);
 
     expect(cell[3]).toHaveTextContent("37");
+  });
+});
+
+describe("prune proposed from sibling notes", () => {
+  test("should remove new proposed digit from note", () => {
+    const { cell, digit, notes } = TEST_GAME;
+
+    fireEvent.click(notes);
+
+    fireEvent.click(cell[1]);
+    fireEvent.click(digit["3"]);
+    fireEvent.click(digit["7"]);
+
+    fireEvent.click(notes);
+
+    fireEvent.click(cell[3]);
+    fireEvent.click(digit["3"]);
+
+    expect(cell[1]).toHaveTextContent("7");
+    expect(cell[1]).not.toHaveTextContent("3");
+  });
+
+  test("should remove replacement proposed digit from note", () => {
+    const { cell, digit, notes } = TEST_GAME;
+
+    fireEvent.click(notes);
+
+    fireEvent.click(cell[1]);
+    fireEvent.click(digit["3"]);
+    fireEvent.click(digit["7"]);
+
+    fireEvent.click(notes);
+
+    fireEvent.click(cell[3]);
+    fireEvent.click(digit["3"]);
+    fireEvent.click(digit["7"]);
+
+    expect(cell[1]).toHaveTextContent("");
+  });
+
+  test("should prune multiple siblings", () => {
+    const { cell, digit, notes } = TEST_GAME;
+
+    fireEvent.click(notes);
+
+    fireEvent.click(digit["5"]);
+    fireEvent.click(cell[1]);
+
+    fireEvent.click(digit["3"]);
+    fireEvent.click(cell[1]);
+    fireEvent.click(cell[5]);
+
+    fireEvent.click(notes);
+
+    fireEvent.click(cell[3]);
+
+    expect(cell[1]).toHaveTextContent("5");
+    expect(cell[1]).not.toHaveTextContent("3");
+
+    expect(cell[5]).toHaveTextContent("");
+  });
+
+  test("should not prune unaffected note", () => {
+    const { cell, digit, notes } = TEST_GAME;
+
+    fireEvent.click(notes);
+
+    fireEvent.click(cell[2]);
+    fireEvent.click(digit["5"]);
+    fireEvent.click(digit["6"]);
+
+    fireEvent.click(notes);
+
+    fireEvent.click(cell[5]);
+    fireEvent.click(digit["7"]);
+
+    expect(cell[2]).toHaveTextContent("56");
   });
 });
