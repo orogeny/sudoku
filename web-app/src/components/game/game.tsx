@@ -411,7 +411,6 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
 
   useEffect(() => {
     if (state.notification) {
-      console.log("clear notification in 300ms");
       setTimeout(handleNotification, 300);
     }
   }, [state.notification]);
@@ -419,28 +418,22 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
   const siblings = cellSiblings(state.selectedIndex);
 
   const handleCellClick = (index: number) => {
-    // dispatch({ type: "cell_clicked", payload: { index } });
     dispatch({ type: "cell_clicked", payload: { index } });
   };
 
   const handleDigitClick = (digit: Digit) => {
-    // dispatch({ type: "digit_clicked", payload: { digit } });
     dispatch({ type: "digit_button_clicked", payload: { digit } });
   };
 
   const handleNotesClick = () => {
-    // dispatch({ type: "notes_toggled" });
     dispatch({ type: "notes_button_clicked" });
   };
 
   const handleUndoClick = () => {
-    // dispatch({ type: "undo_clicked" });
     dispatch({ type: "undo_button_clicked" });
   };
 
   const handleNotification = () => {
-    // dispatch({ type: "cell_error_handled" });
-    console.log("clearing notification");
     dispatch({ type: "notification_cleared" });
   };
 

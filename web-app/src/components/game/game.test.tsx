@@ -105,6 +105,15 @@ describe("digit toggled 'off'", () => {
     expect(cell[1]).not.toHaveTextContent("3");
     expect(cell[1]).toHaveTextContent("5");
   });
+
+  test("should not allow duplicate digit in siblings", () => {
+    const { cell, digit } = TEST_GAME;
+
+    fireEvent.click(cell[2]);
+    fireEvent.click(digit["1"]);
+
+    expect(cell[2]).toHaveTextContent("");
+  });
 });
 
 describe("digit toggled 'on'", () => {
@@ -171,6 +180,15 @@ describe("digit toggled 'on'", () => {
     fireEvent.click(cell[1]);
 
     expect(cell[1]).toHaveTextContent("");
+  });
+
+  test("should not allow duplicate digit in siblings", () => {
+    const { cell, digit } = TEST_GAME;
+
+    fireEvent.click(digit["4"]);
+    fireEvent.click(cell[2]);
+
+    expect(cell[2]).toHaveTextContent("");
   });
 });
 

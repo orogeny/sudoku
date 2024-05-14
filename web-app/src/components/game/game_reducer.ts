@@ -127,17 +127,8 @@ function cellSiblings(index?: number) {
   return siblingIndices;
 }
 
-function filledDigits(cells: Array<Cell>) {
-  return cells.reduce(
-    (acc, cell) => (cell.kind === "note" ? acc : acc.add(cell.digit)),
-    new Set<Digit>(),
-  );
-}
-
 function fillCell(state: GameState, index: number, digit: Digit): GameState {
   const selectedCell = state.cells[index];
-
-  // console.log(`fillCell: cell-${index} with "${digit}"`);
 
   if (selectedCell.kind === "given") {
     return {
@@ -157,6 +148,7 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
     }
 
     if (selectedCell.digit === digit) {
+      // remove proposed digit from cell
       const updatedCells: Cell[] = state.cells.map((cell, i) => {
         if (index === i) {
           return { kind: "note", digits: new Set<Digit>() };
@@ -172,6 +164,7 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
       };
     }
 
+    // set cell's proposed digit
     const updatedCells: Cell[] = state.cells.map((cell, i) => {
       if (index === i) {
         return { kind: "proposed", digit };
@@ -187,16 +180,48 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
     };
   }
 
-  if (state.notesToggled) {
-    const updatedCells: Cell[] = state.cells.map((cell, i) => {
-      if (index === i && cell.kind === "note") {
-        const digits = new Set(cell.digits);
+  if (selectedCell.kind === "note") {
+    if (state.notesToggled) {
+      // add/remove digit from note
+      const updatedCells: Cell[] = state.cells.map((cell, i) => {
+        if (index === i && cell.kind === "note") {
+          const digits = new Set(cell.digits);
 
-        if (!digits.delete(digit)) {
-          digits.add(digit);
+          if (!digits.delete(digit)) {
+            digits.add(digit);
+          }
+
+          return { ...cell, digits };
         }
+        return cell;
+      });
 
-        return { ...cell, digits };
+      return {
+        ...state,
+        cells: updatedCells,
+      };
+    }
+
+    // set empty cell's proposed value
+
+    // 1. check for sibling clash
+    const siblingDigits = Array.from(cellSiblings(index)).reduce((acc, si) => {
+      const sibling = state.cells[si];
+
+      return sibling.kind === "note" ? acc : acc.add(sibling.digit);
+    }, new Set<Digit>());
+
+    if (siblingDigits.has(digit)) {
+      return {
+        ...state,
+        notification: { index, reason: "clash" },
+      };
+    }
+
+    // 2. replace empty cell with proposed digit
+    const updatedCells: Cell[] = state.cells.map((cell, i) => {
+      if (index === i) {
+        return { kind: "proposed", digit };
       }
       return cell;
     });
@@ -204,21 +229,11 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
     return {
       ...state,
       cells: updatedCells,
+      highlightDigit: digit,
     };
   }
 
-  const updatedCells: Cell[] = state.cells.map((cell, i) => {
-    if (index === i) {
-      return { kind: "proposed", digit };
-    }
-    return cell;
-  });
-
-  return {
-    ...state,
-    cells: updatedCells,
-    highlightDigit: digit,
-  };
+  throw new Error(`Unknown cell type: ${selectedCell.kind}`);
 }
 
 function gameReducer(state: GameState, action: GameAction): GameState {
@@ -227,7 +242,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
   }
 
   if (state.notification) {
-    console.log("we have notification:", state.notification);
     return state;
   }
 
@@ -259,8 +273,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
   }
 
   if (action.type === "cell_clicked") {
-    // console.log(`cell-${action.payload.index} clicked`);
-
     if (state.toggledDigit) {
       return fillCell(state, action.payload.index, state.toggledDigit);
     }
@@ -285,7 +297,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     };
   }
 
-  throw new Error(`unhandled action: ${action.type}`);
+  throw new Error(`Unhandled action: ${action.type}`);
 
   // if (action.type === "digit_button_clicked") {
   //   if (state.selectedIndex === undefined) {
@@ -354,7 +366,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
 export {
   DIGITS,
   cellSiblings,
-  filledDigits,
   gameReducer,
   generatePuzzle,
   isDigit,
