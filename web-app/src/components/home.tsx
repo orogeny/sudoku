@@ -1,6 +1,5 @@
-// import { generatePuzzle } from "../shared/generate_puzzle";
-import { generatePuzzle } from "./game/game_reducer";
 import { Game } from "./game/game";
+import { generatePuzzle } from "./game/game_reducer";
 
 function Home() {
   return <Game puzzle={generatePuzzle("Hard")} />;
