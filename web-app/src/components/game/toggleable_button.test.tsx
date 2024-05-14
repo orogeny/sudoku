@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
-import { ToggleableButton } from "./buttons";
+import { ToggleableButton } from "./toggleable_button";
 
 describe("ToggleableButton", () => {
   test("should handle click", () => {
