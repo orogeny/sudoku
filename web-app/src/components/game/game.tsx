@@ -36,7 +36,6 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
   };
 
   const handleUndoClick = () => {
-    console.log("undo clicked");
     dispatch({ type: "undo_button_clicked" });
   };
 
