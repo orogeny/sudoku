@@ -131,6 +131,7 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
   const selectedCell = state.cells[index];
 
   if (selectedCell.kind === "given") {
+    // clicking a given should highlight the given digit
     return {
       ...state,
       selectedIndex: index,
@@ -141,6 +142,7 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
 
   if (selectedCell.kind === "proposed") {
     if (state.notesToggled) {
+      // trying to put notes in a proposed cell should briefly flash gray
       return {
         ...state,
         notification: { index, reason: "proposed" },
@@ -148,7 +150,7 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
     }
 
     if (selectedCell.digit === digit) {
-      // remove proposed digit from cell
+      // remove proposed digit from cell when digit clicked a second time
       const updatedCells: Cell[] = state.cells.map((cell, i) => {
         if (index === i) {
           return { kind: "note", digits: new Set<Digit>() };
@@ -161,10 +163,11 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
         cells: updatedCells,
         selectedIndex: undefined,
         highlightDigit: undefined,
+        changes: state.changes.push({ index, cell: state.cells[index] }),
       };
     }
 
-    // replace cell's proposed digit
+    // replace cell's existing proposed digit
 
     // 1. check for sibling clash
     const siblings = cellSiblings(index);
@@ -182,7 +185,18 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
       };
     }
 
-    // 2. replace existing proposal with this one and prune sibling notes
+    // 2. find all notes that will be pruned
+    const prunableSiblings = Array.from(siblings)
+      .map((si) => ({ index: si, cell: state.cells[si] }))
+      .filter(
+        (item) => item.cell.kind === "note" && item.cell.digits.has(digit),
+      );
+
+    const changes = state.changes
+      .pushAll(prunableSiblings)
+      .push({ index, cell: state.cells[index] });
+
+    // 3. replace existing proposal with this one and prune sibling notes
     const updatedCells: Cell[] = state.cells.map((cell, i) => {
       if (index === i) {
         return { kind: "proposed", digit };
@@ -202,6 +216,7 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
       cells: updatedCells,
       selectedIndex: index,
       highlightDigit: digit,
+      changes,
     };
   }
 
@@ -224,6 +239,7 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
       return {
         ...state,
         cells: updatedCells,
+        changes: state.changes.push({ index, cell: state.cells[index] }),
       };
     }
 
@@ -245,7 +261,18 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
       };
     }
 
-    // 2. replace empty cell with proposed digit and prune sibling notes
+    // 2. find all sibling notes that will be pruned
+    const prunableSiblings = Array.from(siblings)
+      .map((si) => ({ index: si, cell: state.cells[si] }))
+      .filter(
+        (item) => item.cell.kind === "note" && item.cell.digits.has(digit),
+      );
+
+    const changes = state.changes
+      .pushAll(prunableSiblings)
+      .push({ index, cell: state.cells[index] });
+
+    // 3. replace empty cell with proposed digit and prune sibling notes
     const updatedCells: Cell[] = state.cells.map((cell, i) => {
       if (index === i) {
         return { kind: "proposed", digit };
@@ -264,6 +291,7 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
       ...state,
       cells: updatedCells,
       highlightDigit: digit,
+      changes,
     };
   }
 
@@ -284,6 +312,28 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       ...state,
       notesToggled: !state.notesToggled,
     };
+  }
+
+  if (action.type === "undo_button_clicked") {
+    const { item, rest } = state.changes.pop();
+
+    if (item) {
+      const updatedCells = state.cells.map((cell, i) => {
+        if (item.index === i) {
+          return item.cell;
+        }
+        return cell;
+      });
+
+      return {
+        ...state,
+        cells: updatedCells,
+        changes: rest,
+      };
+    }
+
+    // no changes to undo
+    return state;
   }
 
   if (action.type === "digit_button_clicked") {
@@ -332,69 +382,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
   }
 
   throw new Error(`Unhandled action: ${action.type}`);
-
-  // if (action.type === "digit_button_clicked") {
-  //   if (state.selectedIndex === undefined) {
-  //     // we need to toggle a digit button
-  //     if (state.toggledDigit === action.payload.digit) {
-  //       // untoggle this digit button
-  //       return { ...state, toggledDigit: undefined };
-  //     }
-  //     // Otherwise, toggle the selected digit button
-  //     return { ...state, toggledDigit: action.payload.digit };
-  //   }
-
-  //   // A cell is currently selected
-  //   const selectedCell = state.cells[state.selectedIndex];
-
-  //   if (selectedCell.kind === "given") {
-  //     return {
-  //       ...state,
-  //       selectedIndex: undefined,
-  //       toggledDigit: selectedCell.digit,
-  //       highlightDigit: action.payload.digit,
-  //     };
-  //   }
-  // }
-
-  // if (action.type === "cell_clicked") {
-  //   const clickedCell = state.cells[action.payload.index];
-
-  //   console.log(
-  //     `cell[${action.payload.index}]:${clickedCell.kind} - "${clickedCell.kind !== "note" ? clickedCell.digit : "N"}"`,
-  //   );
-
-  //   if (state.toggledDigit === undefined) {
-  //     if (clickedCell.kind === "given" || clickedCell.kind === "proposed") {
-  //       return {
-  //         ...state,
-  //         selectedIndex: action.payload.index,
-  //         highlightDigit: clickedCell.digit,
-  //       };
-  //     }
-  //   }
-
-  //   if (state.toggledDigit !== undefined) {
-  //     // attempt to fill cell with digit pressed
-  //     if (clickedCell.kind === "given") {
-  //       return {
-  //         ...state,
-  //         selectedIndex: action.payload.index,
-  //         highlightDigit: clickedCell.digit,
-  //         toggledDigit: undefined,
-  //       };
-  //     }
-
-  //     const updatedCells = state.cells.map((cell, index) => {
-  //       if (index === action.payload.index) {
-  //         return { kind: "proposed", digit: state.toggledDigit } as Cell;
-  //       }
-  //       return cell;
-  //     });
-
-  //     return { ...state, cells: updatedCells };
-  //   }
-  // }
 }
 
 export {

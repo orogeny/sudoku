@@ -418,3 +418,99 @@ describe("prune proposed from sibling notes", () => {
     expect(cell[2]).toHaveTextContent("56");
   });
 });
+
+describe("undo changes", () => {
+  test("should initially do nothing", () => {
+    const { cell, undo } = TEST_GAME;
+
+    fireEvent.click(cell[1]);
+
+    fireEvent.click(undo);
+
+    expect(cell[1]).toHaveTextContent("");
+  });
+
+  test("should undo proposed cell", () => {
+    const { cell, digit, undo } = TEST_GAME;
+
+    fireEvent.click(cell[1]);
+    fireEvent.click(digit["3"]);
+
+    fireEvent.click(undo);
+
+    expect(cell[1]).toHaveTextContent("");
+  });
+
+  test("should undo second proposed digit", () => {
+    const { cell, digit, undo } = TEST_GAME;
+
+    fireEvent.click(digit["3"]);
+    fireEvent.click(cell[1]);
+
+    fireEvent.click(digit["5"]);
+    fireEvent.click(cell[1]);
+
+    fireEvent.click(undo);
+
+    expect(cell[1]).toHaveTextContent("3");
+  });
+
+  test("should restore double clicked proposal", () => {
+    const { cell, digit, undo } = TEST_GAME;
+
+    fireEvent.click(digit["5"]);
+    fireEvent.click(cell[1]);
+    fireEvent.click(cell[1]);
+
+    expect(digits(cell[1])).toHaveLength(0);
+
+    fireEvent.click(undo);
+
+    expect(cell[1]).toHaveTextContent("5");
+  });
+
+  test("should undo deletion by double click", () => {
+    const { cell, digit, undo } = TEST_GAME;
+
+    fireEvent.click(cell[1]);
+    fireEvent.click(digit["5"]);
+    fireEvent.click(digit["5"]);
+
+    fireEvent.click(undo);
+
+    expect(cell[1]).toHaveTextContent("5");
+  });
+
+  test("should empty note", () => {
+    const { cell, digit, notes, undo } = TEST_GAME;
+
+    fireEvent.click(cell[1]);
+
+    fireEvent.click(notes);
+
+    fireEvent.click(digit["3"]);
+    fireEvent.click(digit["5"]);
+
+    fireEvent.click(undo);
+    fireEvent.click(undo);
+
+    expect(digits(cell[1])).toHaveLength(0);
+  });
+
+  test("should revert proposed back to notes", () => {
+    const { cell, digit, notes, undo } = TEST_GAME;
+
+    fireEvent.click(cell[2]);
+
+    fireEvent.click(notes);
+    fireEvent.click(digit["5"]);
+    fireEvent.click(digit["7"]);
+
+    fireEvent.click(notes);
+    fireEvent.click(digit["6"]);
+
+    fireEvent.click(undo);
+
+    expect(cell[2]).toHaveTextContent("57");
+  });
+});
