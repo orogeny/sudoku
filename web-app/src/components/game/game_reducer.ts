@@ -127,6 +127,59 @@ function cellSiblings(index?: number) {
   return siblingIndices;
 }
 
+function updateAndPrune(
+  state: GameState,
+  index: number,
+  digit: Digit,
+): GameState {
+  // 1. check for sibling clash
+  const siblings = cellSiblings(index);
+
+  const siblingDigits = Array.from(siblings).reduce((acc, si) => {
+    const sibling = state.cells[si];
+
+    return sibling.kind === "note" ? acc : acc.add(sibling.digit);
+  }, new Set<Digit>());
+
+  if (siblingDigits.has(digit)) {
+    return {
+      ...state,
+      notification: { index, reason: "clash" },
+    };
+  }
+
+  // 2. find all sibling notes that will be pruned
+  const prunableSiblings = Array.from(siblings)
+    .map((si) => ({ index: si, cell: state.cells[si] }))
+    .filter((item) => item.cell.kind === "note" && item.cell.digits.has(digit));
+
+  const changes = state.changes
+    .pushAll(prunableSiblings)
+    .push({ index, cell: state.cells[index] });
+
+  // 3. replace empty cell with proposed digit and prune sibling notes
+  const updatedCells: Cell[] = state.cells.map((cell, i) => {
+    if (index === i) {
+      return { kind: "proposed", digit };
+    }
+    if (siblings.has(i) && cell.kind === "note" && cell.digits.has(digit)) {
+      const digits = new Set(cell.digits);
+
+      digits.delete(digit);
+
+      return { kind: "note", digits };
+    }
+    return cell;
+  });
+
+  return {
+    ...state,
+    cells: updatedCells,
+    highlightDigit: digit,
+    changes,
+  };
+}
+
 function fillCell(state: GameState, index: number, digit: Digit): GameState {
   const selectedCell = state.cells[index];
 
@@ -168,56 +221,7 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
     }
 
     // replace cell's existing proposed digit
-
-    // 1. check for sibling clash
-    const siblings = cellSiblings(index);
-
-    const siblingDigits = Array.from(siblings).reduce((acc, si) => {
-      const sibling = state.cells[si];
-
-      return sibling.kind === "note" ? acc : acc.add(sibling.digit);
-    }, new Set<Digit>());
-
-    if (siblingDigits.has(digit)) {
-      return {
-        ...state,
-        notification: { index, reason: "clash" },
-      };
-    }
-
-    // 2. find all notes that will be pruned
-    const prunableSiblings = Array.from(siblings)
-      .map((si) => ({ index: si, cell: state.cells[si] }))
-      .filter(
-        (item) => item.cell.kind === "note" && item.cell.digits.has(digit),
-      );
-
-    const changes = state.changes
-      .pushAll(prunableSiblings)
-      .push({ index, cell: state.cells[index] });
-
-    // 3. replace existing proposal with this one and prune sibling notes
-    const updatedCells: Cell[] = state.cells.map((cell, i) => {
-      if (index === i) {
-        return { kind: "proposed", digit };
-      }
-      if (siblings.has(i) && cell.kind === "note" && cell.digits.has(digit)) {
-        const digits = new Set(cell.digits);
-
-        digits.delete(digit);
-
-        return { kind: "note", digits };
-      }
-      return cell;
-    });
-
-    return {
-      ...state,
-      cells: updatedCells,
-      selectedIndex: index,
-      highlightDigit: digit,
-      changes,
-    };
+    return updateAndPrune(state, index, digit);
   }
 
   if (selectedCell.kind === "note") {
@@ -244,55 +248,7 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
     }
 
     // set empty cell's proposed value
-
-    // 1. check for sibling clash
-    const siblings = cellSiblings(index);
-
-    const siblingDigits = Array.from(siblings).reduce((acc, si) => {
-      const sibling = state.cells[si];
-
-      return sibling.kind === "note" ? acc : acc.add(sibling.digit);
-    }, new Set<Digit>());
-
-    if (siblingDigits.has(digit)) {
-      return {
-        ...state,
-        notification: { index, reason: "clash" },
-      };
-    }
-
-    // 2. find all sibling notes that will be pruned
-    const prunableSiblings = Array.from(siblings)
-      .map((si) => ({ index: si, cell: state.cells[si] }))
-      .filter(
-        (item) => item.cell.kind === "note" && item.cell.digits.has(digit),
-      );
-
-    const changes = state.changes
-      .pushAll(prunableSiblings)
-      .push({ index, cell: state.cells[index] });
-
-    // 3. replace empty cell with proposed digit and prune sibling notes
-    const updatedCells: Cell[] = state.cells.map((cell, i) => {
-      if (index === i) {
-        return { kind: "proposed", digit };
-      }
-      if (siblings.has(i) && cell.kind === "note" && cell.digits.has(digit)) {
-        const digits = new Set(cell.digits);
-
-        digits.delete(digit);
-
-        return { kind: "note", digits };
-      }
-      return cell;
-    });
-
-    return {
-      ...state,
-      cells: updatedCells,
-      highlightDigit: digit,
-      changes,
-    };
+    return updateAndPrune(state, index, digit);
   }
 
   throw new Error(`Unknown cell type: ${selectedCell.kind}`);
