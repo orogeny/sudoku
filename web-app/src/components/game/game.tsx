@@ -1,15 +1,8 @@
 import { useEffect, useReducer, useState } from "react";
 import { cn } from "../../shared/cn";
 import { ToggleableButton } from "./buttons";
-import {
-  Cell,
-  DIGITS,
-  Digit,
-  Puzzle,
-  cellSiblings,
-  gameReducer,
-  setup,
-} from "./game_reducer";
+import { cellSiblings, gameReducer, setup } from "./game_reducer";
+import { Cell, DIGITS, Digit, Puzzle } from "../../shared/common";
 
 function Game({ puzzle }: { puzzle: Puzzle }) {
   const [state, dispatch] = useReducer(gameReducer, puzzle, setup);

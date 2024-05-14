@@ -1,38 +1,10 @@
-import { Level } from "../../shared/common";
+import { Cell, Digit, Level, Puzzle, isDigit } from "../../shared/common";
 import { Stack } from "../../shared/stack";
-
-const DIGITS = ["1", "2", "3", "4", "5", "6", "7", "8", "9"] as const;
-
-type Digit = (typeof DIGITS)[number];
-
-function isDigit(value: unknown): value is Digit {
-  return (
-    typeof value === "string" &&
-    value.length === 1 &&
-    value >= "1" &&
-    value <= "9"
-  );
-}
-
-type Puzzle = {
-  givens: string;
-  solution: string;
-};
 
 type CellNotification = {
   index: number;
   reason: Cell[keyof Cell] | "clash";
 };
-
-type Cell =
-  | {
-      kind: "given" | "proposed";
-      digit: Digit;
-    }
-  | {
-      kind: "note";
-      digits: Set<Digit>;
-    };
 
 type GameState = {
   cells: Cell[];
@@ -341,15 +313,10 @@ function gameReducer(state: GameState, action: GameAction): GameState {
 }
 
 export {
-  DIGITS,
   cellSiblings,
   gameReducer,
   generatePuzzle,
-  isDigit,
   setup,
-  type Cell,
-  type Digit,
   type GameAction,
   type GameState,
-  type Puzzle,
 };

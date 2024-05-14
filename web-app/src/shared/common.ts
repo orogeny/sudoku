@@ -31,16 +31,18 @@ function extractDigits(text: string) {
 
 type Cell =
   | {
-      kind: "empty";
-    }
-  | {
       kind: "given" | "proposed";
       digit: Digit;
     }
   | {
       kind: "note";
-      digits: string;
+      digits: Set<Digit>;
     };
+
+type Puzzle = {
+  givens: string;
+  solution: string;
+};
 
 export {
   DIGITS,
@@ -50,4 +52,5 @@ export {
   type Cell,
   type Digit,
   type Level,
+  type Puzzle,
 };

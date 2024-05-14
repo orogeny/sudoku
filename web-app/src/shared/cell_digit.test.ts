@@ -1,18 +1,12 @@
 import { describe, expect, test } from "vitest";
 import { cellDigit } from "./cell_digit";
-import { Cell } from "./common";
+import { Cell, Digit } from "./common";
 
 describe("cellDigit", () => {
-  test("empty", () => {
-    const empty = { kind: "empty" } as Cell;
-
-    expect(cellDigit(empty)).toBeUndefined();
-  });
-
   test("note", () => {
     const note = {
       kind: "note",
-      digits: "139",
+      digits: new Set<Digit>(["1", "3", "9"]),
     } as Cell;
 
     expect(cellDigit(note)).toBeUndefined();
