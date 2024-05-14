@@ -16,7 +16,7 @@ function cellDigit(xs: Cell | Cell[], index?: number) {
     cell = xs; // xs is a Cell
   }
 
-  if (cell.kind === "empty" || cell.kind === "note") {
+  if (cell.kind === "note") {
     return undefined;
   }
 
