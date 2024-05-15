@@ -38,7 +38,7 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
 
   return (
     <>
-      <main className="mx-auto flex min-w-[576px] max-w-[640px] flex-col gap-6 xl:max-w-fit xl:flex-row xl:gap-8">
+      <main className="flex flex-col gap-6 xl:flex-row xl:gap-8">
         <div className="grid grid-cols-4 gap-4 xl:order-2 xl:grid-cols-2 xl:gap-6 xl:self-end">
           <ToggleableButton
             className="flex h-12 basis-1/4 items-center justify-around rounded bg-zinc-300 text-2xl font-semibold text-slate-800 shadow-sm 
@@ -72,7 +72,7 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
           </button>
         </div>
 
-        <div className="flex min-w-[576px] flex-col gap-6">
+        <div className="flex flex-col gap-6">
           <div
             className={cn(
               "grid aspect-square grid-cols-9 grid-rows-9 shadow-sm",
