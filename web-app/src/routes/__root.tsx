@@ -9,7 +9,7 @@ function RootLayout() {
   return (
     <div className="container mx-auto flex min-w-[576px] flex-col gap-8 sm:max-w-screen-sm xl:max-w-[1048px]">
       <div className="self-stretch">
-        <Header />
+        <Header></Header>
       </div>
       <Outlet />
     </div>

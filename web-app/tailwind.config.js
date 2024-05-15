@@ -4,6 +4,19 @@ export default {
   theme: {
     extend: {
       colors: {
+        "black-pearl": {
+          50: "#F4F6FB",
+          100: "#E7EDF7",
+          200: "#CAD9ED",
+          300: "#9CBADD",
+          400: "#6796C9",
+          500: "#4378B4",
+          600: "#325F97",
+          700: "#294C7B",
+          800: "#264266",
+          900: "#243956",
+          950: "#0F1724",
+        },
         "bright-turquoise": {
           50: "#EEFFFD",
           100: "#C5FFFA",
