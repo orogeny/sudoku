@@ -1,4 +1,4 @@
-const LEVELS = ["Easy", "Medium", "Hard", "Expert", "Master"] as const;
+const LEVELS = ["Easy", "Medium", "Hard", "Expert"] as const;
 
 type Level = (typeof LEVELS)[number];
 
