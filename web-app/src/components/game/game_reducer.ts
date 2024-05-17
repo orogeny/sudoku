@@ -1,5 +1,7 @@
-import { Cell, Digit, Level, Puzzle, isDigit } from "../../shared/common";
-import { Stack } from "../../shared/stack";
+import { Cell, Puzzle } from "@/shared/common";
+import { Digit, isDigit } from "@/shared/digit";
+import { Level } from "@/shared/level";
+import { Stack } from "@/shared/stack";
 
 type CellNotification = {
   index: number;

@@ -1,4 +1,5 @@
-import { Level, Puzzle } from "./common";
+import { Puzzle } from "./common";
+import { Level } from "./level";
 
 const puzzles: Record<Level, Puzzle[]> = {
   Easy: [
@@ -22,6 +23,12 @@ const puzzles: Record<Level, Puzzle[]> = {
     },
   ],
   Medium: [
+    {
+      givens:
+        "9...1.248.1.65...........6.8.4.9..3.56....827.718....4......5.3..3.764.2.9..8....",
+      solution:
+        "956317248412658379738249165824795631569134827371862954647921583183576492295483716",
+    },
     {
       givens:
         "9786..2..6..1248.7....8...54.635.9.831...864....4.253..31.79.5..9754..23..4..3.89",

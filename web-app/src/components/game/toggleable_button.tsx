@@ -1,7 +1,7 @@
-import { ComponentProps } from "react";
-import { cn } from "../../shared/cn";
+import { cn } from "@/lib/utils";
+import { ComponentPropsWithoutRef } from "react";
 
-type ToggleableButtonProps = ComponentProps<"button"> & {
+type ToggleableButtonProps = ComponentPropsWithoutRef<"button"> & {
   toggled?: boolean;
   toggledClassName?: string;
 };

@@ -1,6 +1,7 @@
+import { cn } from "@/lib/utils";
+import { Cell, Puzzle } from "@/shared/common";
+import { DIGITS, Digit } from "@/shared/digit";
 import { useEffect, useReducer, useState } from "react";
-import { cn } from "../../shared/cn";
-import { Cell, DIGITS, Digit, Puzzle } from "../../shared/common";
 import { cellSiblings, gameReducer, setup } from "./game_reducer";
 import { ToggleableButton } from "./toggleable_button";
 
@@ -39,7 +40,7 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
   return (
     <>
       <main className="flex flex-col gap-6 xl:flex-row xl:gap-8">
-        <div className="grid grid-cols-4 gap-4 xl:order-2 xl:grid-cols-2 xl:gap-6 xl:self-end">
+        <div className="grid grid-cols-4 gap-4 px-0.5 xl:order-2 xl:grid-cols-2 xl:gap-6 xl:self-end">
           <ToggleableButton
             className="flex h-12 basis-1/4 items-center justify-around rounded bg-zinc-300 text-2xl font-semibold text-slate-800 shadow-sm 
             xl:order-3 xl:h-16 xl:w-44"
@@ -124,7 +125,7 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
             ))}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 px-0.5">
             {DIGITS.map((d) => (
               <ToggleableButton
                 key={d}

@@ -1,4 +1,5 @@
-import { Cell, Digit } from "./common";
+import { Cell } from "./common";
+import { Digit } from "./digit";
 
 function cellDigit(cell: Cell): Digit | undefined;
 
