@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
-import { Cell } from "@/shared/common";
+import { Cell, siblingsOf } from "@/shared/cell";
 import { DIGITS, Digit } from "@/shared/digit";
 import { Puzzle } from "@/shared/puzzle";
 import { useEffect, useReducer, useState } from "react";
-import { cellSiblings, gameReducer, setup } from "./game_reducer";
+import { gameReducer, setup } from "./game_reducer";
 import { ToggleableButton } from "./toggleable_button";
 
 function Game({ puzzle }: { puzzle: Puzzle }) {
@@ -16,7 +16,7 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
     }
   }, [state.notification]);
 
-  const siblings = cellSiblings(state.selectedIndex);
+  const siblings = siblingsOf(state.selectedIndex);
 
   const handleCellClick = (index: number) => {
     dispatch({ type: "cell_clicked", payload: { index } });
