@@ -10,9 +10,4 @@ type Cell =
       digits: Set<Digit>;
     };
 
-type Puzzle = {
-  givens: string;
-  solution: string;
-};
-
-export { type Cell, type Puzzle };
+export { type Cell };

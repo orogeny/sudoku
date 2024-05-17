@@ -1,5 +1,9 @@
-import { Puzzle } from "./common";
 import { Level } from "./level";
+
+type Puzzle = {
+  givens: string;
+  solution: string;
+};
 
 const puzzles: Record<Level, Puzzle[]> = {
   Easy: [
@@ -60,4 +64,4 @@ function generatePuzzle(level: Level, randomFactor: number) {
   return grids[Math.floor(randomFactor * grids.length)];
 }
 
-export { generatePuzzle };
+export { generatePuzzle, type Puzzle };

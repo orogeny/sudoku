@@ -1,6 +1,6 @@
-import { Cell, Puzzle } from "@/shared/common";
+import { Cell } from "@/shared/common";
 import { Digit, isDigit } from "@/shared/digit";
-import { Level } from "@/shared/level";
+import { Puzzle } from "@/shared/puzzle";
 import { Stack } from "@/shared/stack";
 
 type CellNotification = {
@@ -55,19 +55,6 @@ function setup(puzzle: Puzzle) {
     notification: undefined,
     notesToggled: false,
     changes: new Stack<{ index: number; cell: Cell }>(),
-  };
-}
-
-function generatePuzzle(difficulty: Level) {
-  if (difficulty !== "Hard") {
-    return { givens: "", solution: "" };
-  }
-
-  return {
-    givens:
-      "9...1.248.1.65...........6.8.4.9..3.56....827.718....4......5.3..3.764.2.9..8....",
-    solution:
-      "956317248412658379738249165824795631569134827371862954647921583183576492295483716",
   };
 }
 
@@ -314,11 +301,4 @@ function gameReducer(state: GameState, action: GameAction): GameState {
   throw new Error(`Unhandled action: ${action.type}`);
 }
 
-export {
-  cellSiblings,
-  gameReducer,
-  generatePuzzle,
-  setup,
-  type GameAction,
-  type GameState,
-};
+export { cellSiblings, gameReducer, setup, type GameAction, type GameState };

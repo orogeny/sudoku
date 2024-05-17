@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { generatePuzzle } from "./generate_puzzle";
+import { generatePuzzle } from "./puzzle";
 
 describe("generatePuzzle", () => {
   test("puzzles are 81 chars", () => {
