@@ -3,9 +3,14 @@ type Node<T> = { item?: T; rest: Stack<T> };
 class Stack<T> {
   private item?: T;
   private rest?: Stack<T>;
+  private length?: number;
 
   get isEmpty() {
     return this.item === undefined;
+  }
+
+  get size() {
+    return this.length ?? 0;
   }
 
   push(item: T) {
@@ -13,6 +18,7 @@ class Stack<T> {
 
     stack.item = item;
     stack.rest = this;
+    stack.length = this.length === undefined ? 1 : this.length + 1;
 
     return stack;
   }

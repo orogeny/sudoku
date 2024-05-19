@@ -51,4 +51,28 @@ describe("Stack", () => {
 
     expect(noChanges).toBe(updated);
   });
+
+  test("empty stack has size 0", () => {
+    const stack = new Stack<string>();
+
+    expect(stack.size).toBe(0);
+  });
+
+  test("should be one after first push", () => {
+    const stack = new Stack<string>();
+
+    const updated = stack.push("one");
+
+    expect(updated.size).toBe(1);
+  });
+
+  test("should decrease size after pop()", () => {
+    const stack = new Stack<string>();
+
+    const three = stack.pushAll(["one", "two", "three"]);
+
+    const { item: _, rest: two } = three.pop();
+
+    expect(two.size).toBe(2);
+  });
 });
