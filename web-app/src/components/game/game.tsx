@@ -53,8 +53,9 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
           </ToggleableButton>
 
           <button
-            className="flex h-12 basis-1/4 items-center justify-around rounded bg-zinc-300 text-2xl font-semibold text-slate-900 shadow-sm hover:bg-zinc-400 active:bg-zinc-500 xl:order-1 xl:h-16 xl:w-44"
+            className="flex h-12 basis-1/4 items-center justify-around rounded bg-zinc-300 text-2xl font-semibold text-slate-900 shadow-sm hover:bg-zinc-400 active:bg-zinc-500 disabled:bg-zinc-100 disabled:text-slate-400 xl:order-1 xl:h-16 xl:w-44"
             onClick={handleUndoClick}
+            disabled={state.changes.size === 0}
           >
             Undo
           </button>
