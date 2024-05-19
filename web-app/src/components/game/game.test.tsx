@@ -32,12 +32,14 @@ function testSetup(puzzle: Puzzle) {
       };
     }, {}) as Record<Digit, HTMLElement>;
 
+  const erase = screen.getByRole("button", { name: /erase/i });
   const notes = screen.getByRole("button", { name: /notes/i });
   const undo = screen.getByRole("button", { name: /undo/i });
 
   return {
     cell,
     digit,
+    erase,
     notes,
     undo,
     screen,
@@ -512,5 +514,52 @@ describe("undo changes", () => {
     fireEvent.click(undo);
 
     expect(cell[2]).toHaveTextContent("57");
+  });
+});
+
+describe.only("erase toggled: off", () => {
+  test("should not erase given cell", () => {
+    const { cell, erase } = TEST_GAME;
+
+    fireEvent.click(erase);
+
+    fireEvent.click(cell[0]);
+
+    expect(cell[0]).toHaveTextContent("9");
+  });
+
+  test("should erase a proposed cell", () => {
+    const { cell, digit, erase } = TEST_GAME;
+
+    fireEvent.click(cell[1]);
+    fireEvent.click(digit["3"]);
+    fireEvent.click(erase);
+
+    expect(cell[1]).toHaveTextContent("");
+  });
+
+  test("should erase a note cell", () => {
+    const { cell, digit, erase, notes } = TEST_GAME;
+
+    fireEvent.click(notes);
+    fireEvent.click(cell[1]);
+    fireEvent.click(digit["3"]);
+    fireEvent.click(digit["5"]);
+
+    fireEvent.click(erase);
+
+    expect(cell[1]).toHaveTextContent("");
+  });
+
+  test("should work with undo", () => {
+    const { cell, digit, erase, undo } = TEST_GAME;
+
+    fireEvent.click(cell[1]);
+    fireEvent.click(digit["3"]);
+    fireEvent.click(erase);
+
+    fireEvent.click(undo);
+
+    expect(cell[1]).toHaveTextContent("3");
   });
 });

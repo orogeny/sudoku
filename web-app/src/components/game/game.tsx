@@ -2,13 +2,12 @@ import { cn } from "@/lib/utils";
 import { Cell, siblingsOf } from "@/shared/cell";
 import { DIGITS, Digit } from "@/shared/digit";
 import { Puzzle } from "@/shared/puzzle";
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer } from "react";
 import { gameReducer, setup } from "./game_reducer";
 import { ToggleableButton } from "./toggleable_button";
 
 function Game({ puzzle }: { puzzle: Puzzle }) {
   const [state, dispatch] = useReducer(gameReducer, puzzle, setup);
-  const [eraseMode, setEraseMode] = useState(false);
 
   useEffect(() => {
     if (state.notification) {
@@ -24,6 +23,10 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
 
   const handleDigitClick = (digit: Digit) => {
     dispatch({ type: "digit_button_clicked", payload: { digit } });
+  };
+
+  const handleEraseClick = () => {
+    dispatch({ type: "erase_button_clicked" });
   };
 
   const handleNotesClick = () => {
@@ -64,8 +67,8 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
             className="flex h-12 basis-1/4 items-center justify-around rounded bg-zinc-300 text-2xl font-semibold text-slate-800 shadow-sm 
             xl:order-4 xl:h-16 xl:w-44"
             toggledClassName="bg-zinc-500 text-white"
-            toggled={eraseMode}
-            onClick={() => setEraseMode((_) => !eraseMode)}
+            toggled={state.eraseToggled}
+            onClick={handleEraseClick}
           >
             Erase
           </ToggleableButton>
@@ -119,6 +122,11 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
                     "bg-red-300":
                       state.notification?.index === i &&
                       state.notification?.reason === "clash",
+                  },
+                  {
+                    "bg-sky-200":
+                      state.notification?.index === i &&
+                      state.notification?.reason === "given",
                   },
                 )}
               >

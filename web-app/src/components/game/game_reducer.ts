@@ -15,6 +15,7 @@ type GameState = {
   highlightDigit?: Digit;
   selectedIndex?: number;
   notification?: CellNotification;
+  eraseToggled: boolean;
   notesToggled: boolean;
   changes: Stack<{ index: number; cell: Cell }>;
 };
@@ -22,8 +23,9 @@ type GameState = {
 type GameAction =
   | {
       type:
-        | "notification_cleared"
+        | "erase_button_clicked"
         | "notes_button_clicked"
+        | "notification_cleared"
         | "undo_button_clicked";
     }
   | {
@@ -53,6 +55,7 @@ function setup(puzzle: Puzzle) {
     highlightDigit: undefined,
     selectedIndex: undefined,
     notification: undefined,
+    eraseToggled: false,
     notesToggled: false,
     changes: new Stack<{ index: number; cell: Cell }>(),
   };
@@ -185,12 +188,45 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
   throw new Error(`Unknown cell type: ${selectedCell.kind}`);
 }
 
+function eraseCell(state: GameState, index: number): GameState {
+  const selectedCell = state.cells[index];
+
+  if (selectedCell.kind === "given") {
+    // We can't erase given cells, notify user
+    return { ...state, notification: { index, reason: "given" } };
+  }
+
+  if (selectedCell.kind === "note" && selectedCell.digits.size === 0) {
+    return state;
+  }
+
+  const updatedCells: Cell[] = state.cells.map((cell, i) => {
+    if (index === i) {
+      return { kind: "note", digits: new Set<Digit>() };
+    }
+    return cell;
+  });
+
+  return {
+    ...state,
+    cells: updatedCells,
+    changes: state.changes.push({ index, cell: state.cells[index] }),
+  };
+}
+
 function gameReducer(state: GameState, action: GameAction): GameState {
   if (action.type === "notification_cleared") {
     return { ...state, notification: undefined };
   }
 
   if (state.notification) {
+    return state;
+  }
+
+  if (action.type === "erase_button_clicked") {
+    if (state.selectedIndex) {
+      return eraseCell(state, state.selectedIndex);
+    }
     return state;
   }
 
