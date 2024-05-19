@@ -1,7 +1,9 @@
-function Header() {
+import { PropsWithChildren } from "react";
+
+function Header({ children }: PropsWithChildren) {
   return (
-    <header className="bg-cyan-200">
-      <h1>The Header</h1>
+    <header className="flex justify-between border-b border-b-iron-300 bg-slate-50 px-0.5 py-2">
+      {children}
     </header>
   );
 }

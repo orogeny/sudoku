@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { DIGITS, extractDigits, isDigit } from "./common";
+import { DIGITS, extractDigits, isDigit } from "./digit";
 
 describe("common - digits", () => {
   test("isDigit", () => {

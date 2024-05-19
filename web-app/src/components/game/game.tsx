@@ -1,7 +1,9 @@
+import { cn } from "@/lib/utils";
+import { Cell, siblingsOf } from "@/shared/cell";
+import { DIGITS, Digit } from "@/shared/digit";
+import { Puzzle } from "@/shared/puzzle";
 import { useEffect, useReducer, useState } from "react";
-import { cn } from "../../shared/cn";
-import { Cell, DIGITS, Digit, Puzzle } from "../../shared/common";
-import { cellSiblings, gameReducer, setup } from "./game_reducer";
+import { gameReducer, setup } from "./game_reducer";
 import { ToggleableButton } from "./toggleable_button";
 
 function Game({ puzzle }: { puzzle: Puzzle }) {
@@ -14,7 +16,7 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
     }
   }, [state.notification]);
 
-  const siblings = cellSiblings(state.selectedIndex);
+  const siblings = siblingsOf(state.selectedIndex);
 
   const handleCellClick = (index: number) => {
     dispatch({ type: "cell_clicked", payload: { index } });
@@ -38,8 +40,8 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
 
   return (
     <>
-      <main className="mx-auto flex min-w-[576px] max-w-[640px] flex-col gap-6 xl:max-w-fit xl:flex-row xl:gap-8">
-        <div className="grid grid-cols-4 gap-4 xl:order-2 xl:grid-cols-2 xl:gap-6 xl:self-end">
+      <main className="flex flex-col gap-6 xl:flex-row xl:gap-8">
+        <div className="grid grid-cols-4 gap-4 px-0.5 xl:order-2 xl:grid-cols-2 xl:gap-6 xl:self-end">
           <ToggleableButton
             className="flex h-12 basis-1/4 items-center justify-around rounded bg-zinc-300 text-2xl font-semibold text-slate-800 shadow-sm 
             xl:order-3 xl:h-16 xl:w-44"
@@ -72,26 +74,26 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
           </button>
         </div>
 
-        <div className="flex min-w-[576px] flex-col gap-6">
+        <div className="flex flex-col gap-6">
           <div
             className={cn(
               "grid aspect-square grid-cols-9 grid-rows-9 shadow-sm",
               "[&>div]:border-r",
-              "[&>div]:border-r-cool-gray-300",
+              "[&>div]:border-r-iron-300",
               "[&>div]:border-b",
-              "[&>div]:border-b-cool-gray-300",
+              "[&>div]:border-b-iron-300",
               "[&>div:nth-child(9n+1)]:border-l-2",
-              "[&>div:nth-child(9n+1)]:border-l-cool-gray-400",
+              "[&>div:nth-child(9n+1)]:border-l-gray-chateau-500",
               "[&>div:nth-child(3n)]:border-r-2",
-              "[&>div:nth-child(3n)]:border-r-cool-gray-400",
+              "[&>div:nth-child(3n)]:border-r-gray-chateau-500",
               "[&>div:nth-child(-n+9)]:border-t-2",
-              "[&>div:nth-child(-n+9)]:border-t-cool-gray-400",
+              "[&>div:nth-child(-n+9)]:border-t-gray-chateau-500",
               "[&>div:nth-child(n+19):nth-child(-n+27)]:border-b-2",
-              "[&>div:nth-child(n+19):nth-child(-n+27)]:border-b-cool-gray-400",
+              "[&>div:nth-child(n+19):nth-child(-n+27)]:border-b-gray-chateau-500",
               "[&>div:nth-child(n+46):nth-child(-n+54)]:border-b-2",
-              "[&>div:nth-child(n+46):nth-child(-n+54)]:border-b-cool-gray-400",
+              "[&>div:nth-child(n+46):nth-child(-n+54)]:border-b-gray-chateau-500",
               "[&>div:nth-child(n+73)]:border-b-2",
-              "[&>div:nth-child(n+73)]:border-b-cool-gray-400",
+              "[&>div:nth-child(n+73)]:border-b-gray-chateau-500",
             )}
           >
             {state.cells.map((c, i) => (
@@ -124,7 +126,7 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
             ))}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 px-0.5">
             {DIGITS.map((d) => (
               <ToggleableButton
                 key={d}

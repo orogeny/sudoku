@@ -1,7 +1,3 @@
-const LEVELS = ["Easy", "Medium", "Hard", "Expert", "Master"] as const;
-
-type Level = (typeof LEVELS)[number];
-
 const DIGITS = ["1", "2", "3", "4", "5", "6", "7", "8", "9"] as const;
 
 type Digit = (typeof DIGITS)[number];
@@ -29,28 +25,4 @@ function extractDigits(text: string) {
   );
 }
 
-type Cell =
-  | {
-      kind: "given" | "proposed";
-      digit: Digit;
-    }
-  | {
-      kind: "note";
-      digits: Set<Digit>;
-    };
-
-type Puzzle = {
-  givens: string;
-  solution: string;
-};
-
-export {
-  DIGITS,
-  LEVELS,
-  extractDigits,
-  isDigit,
-  type Cell,
-  type Digit,
-  type Level,
-  type Puzzle,
-};
+export { DIGITS, extractDigits, isDigit, type Digit };

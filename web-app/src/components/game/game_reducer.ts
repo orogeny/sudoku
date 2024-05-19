@@ -1,5 +1,7 @@
-import { Cell, Digit, Level, Puzzle, isDigit } from "../../shared/common";
-import { Stack } from "../../shared/stack";
+import { Cell, siblingsOf } from "@/shared/cell";
+import { Digit, isDigit } from "@/shared/digit";
+import { Puzzle } from "@/shared/puzzle";
+import { Stack } from "@/shared/stack";
 
 type CellNotification = {
   index: number;
@@ -56,56 +58,13 @@ function setup(puzzle: Puzzle) {
   };
 }
 
-function generatePuzzle(difficulty: Level) {
-  if (difficulty !== "Hard") {
-    return { givens: "", solution: "" };
-  }
-
-  return {
-    givens:
-      "9...1.248.1.65...........6.8.4.9..3.56....827.718....4......5.3..3.764.2.9..8....",
-    solution:
-      "956317248412658379738249165824795631569134827371862954647921583183576492295483716",
-  };
-}
-
-function cellSiblings(index?: number) {
-  if (index === undefined) return new Set<number>();
-
-  const column = index % 9;
-  const row = Math.floor(index / 9);
-  const square = Math.floor(index / 27) * 3 + Math.floor((index % 9) / 3);
-
-  const columnSiblings = Array.from({ length: 9 }).map(
-    (_, i) => column + i * 9,
-  );
-  const rowSiblings = Array.from({ length: 9 }).map((_, i) => row * 9 + i);
-  const squareSiblings = Array.from({ length: 9 }).map(
-    (_, i) =>
-      Math.floor(square / 3) * 27 +
-      (square % 3) * 3 +
-      (i % 3) +
-      Math.floor(i / 3) * 9,
-  );
-
-  const siblingIndices = new Set([
-    ...columnSiblings,
-    ...rowSiblings,
-    ...squareSiblings,
-  ]);
-
-  siblingIndices.delete(index);
-
-  return siblingIndices;
-}
-
 function updateAndPrune(
   state: GameState,
   index: number,
   digit: Digit,
 ): GameState {
   // 1. check for sibling clash
-  const siblings = cellSiblings(index);
+  const siblings = siblingsOf(index);
 
   const siblingDigits = Array.from(siblings).reduce((acc, si) => {
     const sibling = state.cells[si];
@@ -312,11 +271,4 @@ function gameReducer(state: GameState, action: GameAction): GameState {
   throw new Error(`Unhandled action: ${action.type}`);
 }
 
-export {
-  cellSiblings,
-  gameReducer,
-  generatePuzzle,
-  setup,
-  type GameAction,
-  type GameState,
-};
+export { gameReducer, setup, type GameAction, type GameState };

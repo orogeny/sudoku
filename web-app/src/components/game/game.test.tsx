@@ -1,7 +1,8 @@
+import { Digit } from "@/shared/digit";
 import "@testing-library/jest-dom/matchers";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, test } from "vitest";
-import { Digit, Puzzle } from "../../shared/common";
+import { Puzzle } from "@/shared/puzzle";
 import { Game } from "./game";
 
 const PUZZLE: Puzzle = {

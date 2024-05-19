@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { cellDigit } from "./cell_digit";
-import { Cell, Digit } from "./common";
+import { Cell } from "./common";
+import { Digit } from "./digit";
 
 describe("cellDigit", () => {
   test("note", () => {
