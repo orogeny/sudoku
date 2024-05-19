@@ -133,7 +133,7 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
       // trying to put notes in a proposed cell should briefly flash gray
       return {
         ...state,
-        notification: { index, reason: "proposed", delay: 200 },
+        notification: { index, reason: "proposed", delay: 100 },
       };
     }
 
@@ -194,11 +194,11 @@ function eraseCell(state: GameState, index: number): GameState {
 
   if (selectedCell.kind === "given") {
     // We can't erase given cells, notify user
-    return { ...state, notification: { index, reason: "given", delay: 200 } };
+    return { ...state, notification: { index, reason: "given", delay: 100 } };
   }
 
   if (selectedCell.kind === "note" && selectedCell.digits.size === 0) {
-    return { ...state, notification: { index, reason: "empty", delay: 200 } };
+    return { ...state, notification: { index, reason: "empty", delay: 100 } };
   }
 
   const updatedCells: Cell[] = state.cells.map((cell, i) => {
