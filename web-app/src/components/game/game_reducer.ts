@@ -5,7 +5,8 @@ import { Stack } from "@/shared/stack";
 
 type CellNotification = {
   index: number;
-  reason: Cell[keyof Cell] | "clash";
+  reason: Cell[keyof Cell] | "clash" | "empty";
+  delay: number;
 };
 
 type GameState = {
@@ -78,7 +79,7 @@ function updateAndPrune(
   if (siblingDigits.has(digit)) {
     return {
       ...state,
-      notification: { index, reason: "clash" },
+      notification: { index, reason: "clash", delay: 300 },
     };
   }
 
@@ -132,7 +133,7 @@ function fillCell(state: GameState, index: number, digit: Digit): GameState {
       // trying to put notes in a proposed cell should briefly flash gray
       return {
         ...state,
-        notification: { index, reason: "proposed" },
+        notification: { index, reason: "proposed", delay: 200 },
       };
     }
 
@@ -193,11 +194,11 @@ function eraseCell(state: GameState, index: number): GameState {
 
   if (selectedCell.kind === "given") {
     // We can't erase given cells, notify user
-    return { ...state, notification: { index, reason: "given" } };
+    return { ...state, notification: { index, reason: "given", delay: 200 } };
   }
 
   if (selectedCell.kind === "note" && selectedCell.digits.size === 0) {
-    return state;
+    return { ...state, notification: { index, reason: "empty", delay: 200 } };
   }
 
   const updatedCells: Cell[] = state.cells.map((cell, i) => {
@@ -227,14 +228,21 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     if (state.selectedIndex) {
       return eraseCell(state, state.selectedIndex);
     }
-    return state;
+
+    const eraseToggled = !state.eraseToggled;
+
+    const toggledDigit = eraseToggled ? undefined : state.toggledDigit;
+
+    return { ...state, toggledDigit, eraseToggled, highlightDigit: undefined };
   }
 
   if (action.type === "notes_button_clicked") {
-    return {
-      ...state,
-      notesToggled: !state.notesToggled,
-    };
+    // when notes have been toggled on, untoggle the erase button
+    const notesToggled = !state.notesToggled;
+
+    const eraseToggled = notesToggled ? false : state.eraseToggled;
+
+    return { ...state, notesToggled, eraseToggled };
   }
 
   if (action.type === "undo_button_clicked") {
@@ -276,12 +284,17 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       ...state,
       toggledDigit: action.payload.digit,
       highlightDigit: action.payload.digit,
+      eraseToggled: false,
     };
   }
 
   if (action.type === "cell_clicked") {
     if (state.toggledDigit) {
       return fillCell(state, action.payload.index, state.toggledDigit);
+    }
+
+    if (state.eraseToggled) {
+      return eraseCell(state, action.payload.index);
     }
 
     if (state.selectedIndex === action.payload.index) {

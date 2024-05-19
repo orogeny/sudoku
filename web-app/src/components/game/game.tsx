@@ -11,7 +11,9 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
 
   useEffect(() => {
     if (state.notification) {
-      setTimeout(handleNotification, 300);
+      const notification = state.notification;
+
+      setTimeout(handleNotification, notification.delay);
     }
   }, [state.notification]);
 
@@ -126,7 +128,8 @@ function Game({ puzzle }: { puzzle: Puzzle }) {
                   {
                     "bg-sky-200":
                       state.notification?.index === i &&
-                      state.notification?.reason === "given",
+                      (state.notification?.reason === "empty" ||
+                        state.notification?.reason === "given"),
                   },
                 )}
               >
