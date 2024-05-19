@@ -1,3 +1,4 @@
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -16,7 +17,7 @@ type DifficultySelectorProps = {
 
 function DifficultySelector({ value, onValueChange }: DifficultySelectorProps) {
   return (
-    <label className="flex w-52 items-center justify-between gap-2">
+    <Label className="flex w-52 items-center justify-between gap-2">
       Difficulty:
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger className="">
@@ -33,7 +34,7 @@ function DifficultySelector({ value, onValueChange }: DifficultySelectorProps) {
           </SelectGroup>
         </SelectContent>
       </Select>
-    </label>
+    </Label>
   );
 }
 
