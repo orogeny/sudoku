@@ -9,7 +9,7 @@ function App() {
   const [level, setLevel] = useState<Level>(LEVELS[0]);
 
   useEffect(() => {
-    console.log(`User wants to play a ${level} game`);
+    console.log(`Difficulty ${level} chosen`);
   }, [level]);
 
   const handleChange = (value: string) => {
