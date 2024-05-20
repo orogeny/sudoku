@@ -198,9 +198,11 @@ function eraseCell(state: GameState, index: number): GameState {
   }
 
   if (selectedCell.kind === "note" && selectedCell.digits.size === 0) {
+    // There's no point erasing an empty note cell, notify user
     return { ...state, notification: { index, reason: "empty", delay: 100 } };
   }
 
+  // Otherwise, replace this cell with an empty note cell
   const updatedCells: Cell[] = state.cells.map((cell, i) => {
     if (index === i) {
       return { kind: "note", digits: new Set<Digit>() };
@@ -208,9 +210,12 @@ function eraseCell(state: GameState, index: number): GameState {
     return cell;
   });
 
+  // Return new state with cell replaced with empty note and the previous
+  // cell's content added to the changes so we can undo the erase
   return {
     ...state,
     cells: updatedCells,
+    highlightDigit: undefined,
     changes: state.changes.push({ index, cell: state.cells[index] }),
   };
 }
@@ -225,30 +230,39 @@ function gameReducer(state: GameState, action: GameAction): GameState {
   }
 
   if (action.type === "erase_button_clicked") {
-    if (state.selectedIndex) {
+    if (state.selectedIndex !== undefined) {
+      // User wants to erase the selected cell
       return eraseCell(state, state.selectedIndex);
     }
 
-    const eraseToggled = !state.eraseToggled;
-
-    const toggledDigit = eraseToggled ? undefined : state.toggledDigit;
-
-    return { ...state, toggledDigit, eraseToggled, highlightDigit: undefined };
+    // Toggle the Erase button
+    return {
+      ...state,
+      toggledDigit: undefined,
+      highlightDigit: undefined,
+      eraseToggled: !state.eraseToggled,
+    };
   }
 
   if (action.type === "notes_button_clicked") {
-    // when notes have been toggled on, untoggle the erase button
-    const notesToggled = !state.notesToggled;
+    if (state.notesToggled) {
+      // toggle Notes off
+      return { ...state, notesToggled: false };
+    }
 
-    const eraseToggled = notesToggled ? false : state.eraseToggled;
-
-    return { ...state, notesToggled, eraseToggled };
+    // Otherwise toggle Notes on and Erase off
+    return {
+      ...state,
+      notesToggled: true,
+      eraseToggled: false,
+    };
   }
 
   if (action.type === "undo_button_clicked") {
     const { item, rest } = state.changes.pop();
 
     if (item) {
+      // If we have a previous item, re-insert its cell
       const updatedCells = state.cells.map((cell, i) => {
         if (item.index === i) {
           return item.cell;
@@ -256,6 +270,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         return cell;
       });
 
+      // Return our new state with the updated cells and remaining changes
       return {
         ...state,
         cells: updatedCells,
@@ -263,16 +278,17 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
-    // no changes to undo
+    // there are no changes to undo
     return state;
   }
 
   if (action.type === "digit_button_clicked") {
-    if (state.selectedIndex) {
+    if (state.selectedIndex !== undefined) {
       return fillCell(state, state.selectedIndex, action.payload.digit);
     }
 
     if (state.toggledDigit === action.payload.digit) {
+      // User clicked the currently toggled digit, so untoggle it
       return {
         ...state,
         toggledDigit: undefined,
@@ -280,6 +296,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
+    // User toggled the clicked digit button on
     return {
       ...state,
       toggledDigit: action.payload.digit,
@@ -289,15 +306,18 @@ function gameReducer(state: GameState, action: GameAction): GameState {
   }
 
   if (action.type === "cell_clicked") {
-    if (state.toggledDigit) {
-      return fillCell(state, action.payload.index, state.toggledDigit);
-    }
-
     if (state.eraseToggled) {
+      // User wants to delete the contents of this cell
       return eraseCell(state, action.payload.index);
     }
 
+    if (state.toggledDigit) {
+      // User wants to fill this cell with the toggled digit
+      return fillCell(state, action.payload.index, state.toggledDigit);
+    }
+
     if (state.selectedIndex === action.payload.index) {
+      // User wants to deselect the currently selected cell
       return {
         ...state,
         selectedIndex: undefined,
@@ -305,8 +325,10 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
+    // user has selected a different cell
     const selectedCell = state.cells[action.payload.index];
 
+    // if it contains a given or proposed digit, highlight it
     const highlightDigit =
       selectedCell.kind === "note" ? undefined : selectedCell.digit;
 

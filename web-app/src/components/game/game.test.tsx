@@ -606,12 +606,26 @@ describe("erase", () => {
     expect(cell[3]).toHaveTextContent("3");
   });
 
-  test("should toggle Erase: off when a digit is toggled: on", () => {
+  test("should toggle Erase off when a digit is toggled: on", () => {
     const { cell, digit, erase } = TEST_GAME;
 
     fireEvent.click(erase);
 
     fireEvent.click(digit["5"]);
+    fireEvent.click(cell[1]);
+
+    expect(cell[1]).toHaveTextContent("5");
+  });
+
+  test("should not toggle Erase on when trying to erase a given cell", () => {
+    const { cell, digit, erase } = TEST_GAME;
+
+    fireEvent.click(cell[1]);
+    fireEvent.click(digit["5"]);
+
+    fireEvent.click(cell[0]);
+    fireEvent.click(erase);
+
     fireEvent.click(cell[1]);
 
     expect(cell[1]).toHaveTextContent("5");
